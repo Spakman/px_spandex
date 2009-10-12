@@ -14,21 +14,21 @@ class ArtistTest < Test::Unit::TestCase
   end
 
   def test_eql
-    assert_equal Artist.new(artist: "Nirvana"), Artist.new(artist: "Nirvana")
+    assert_equal Messier::Artist.new(artist: "Nirvana"), Messier::Artist.new(artist: "Nirvana")
   end
 
   def test_get
-    artist = Artist.get("Nirvana")
+    artist = Messier::Artist.get("Nirvana")
     assert_equal "Nirvana", artist.name
   end
 
   def test_all_alphabetical
-    assert_equal [ Artist.get("Nirvana"), Artist.get("Pendulum") ], Artist.all
-    assert_not_equal [ Artist.get("Pendulum"), Artist.get("Nirvana") ], Artist.all
+    assert_equal [ Messier::Artist.get("Nirvana"), Messier::Artist.get("Pendulum") ], Messier::Artist.all
+    assert_not_equal [ Messier::Artist.get("Pendulum"), Messier::Artist.get("Nirvana") ], Messier::Artist.all
   end
 
   def test_albums_alphabetical
-    assert_equal 1, Artist.get("Pendulum").albums.length
-    assert_equal "Hold Your Colour", Artist.get("Pendulum").albums.first.name
+    assert_equal 1, Messier::Artist.get("Pendulum").albums.length
+    assert_equal "Hold Your Colour", Messier::Artist.get("Pendulum").albums.first.name
   end
 end

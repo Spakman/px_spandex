@@ -2,39 +2,44 @@
 # Released under the General Public License (GPL) version 3.
 # See COPYING
 
-class Model
-  @@table = Rufus::Tokyo::Table.new(TABLE_FILEPATH)
-
-  def hash
-    @name.hash
-  end
-
-  def eql?(object)
-    hash == object.hash
-  end
-
-  def self.close_table
-    @@table.close
-  end
-
-  def self.open_table
+module Messier
+  class Model
     @@table = Rufus::Tokyo::Table.new(TABLE_FILEPATH)
-  end
 
-  def ==(object)
-    eql? object
-  end
+    def hash
+      @name.hash
+    end
 
-  def self.all
-    results = []
-    column_name = self.to_s.downcase
-    rows = @@table.query do |query|
-      query.order_by column_name
+    def eql?(object)
+      hash == object.hash
     end
-    rows.each do |row|
-      results << self.new(row)
+
+    def self.close_table
+      @@table.close
     end
-    results.uniq
+
+    def self.open_table
+      @@table = Rufus::Tokyo::Table.new(TABLE_FILEPATH)
+    end
+
+    def ==(object)
+      eql? object
+    end
+
+    def <=>(object)
+      name <=> object.name
+    end
+
+    def self.all
+      results = []
+      column_name = self.to_s.downcase
+      rows = @@table.query do |query|
+        query.order_by column_name
+      end
+      rows.each do |row|
+        results << self.new(row)
+      end
+      results.sort.uniq
+    end
   end
 end
-

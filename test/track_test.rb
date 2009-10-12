@@ -14,17 +14,17 @@ class TrackTest < Test::Unit::TestCase
   end
 
   def test_all
-    assert_equal 2, Track.all.length
-    assert_equal "In Bloom", Artist.get("Nirvana").albums.first.tracks.first.name
+    assert_equal 2, Messier::Track.all.length
+    assert_equal "In Bloom", Messier::Artist.get("Nirvana").albums.first.tracks.first.name
   end
 
   def test_artist
-    track = Artist.get("Nirvana").albums.first.tracks.first
-    assert_equal Artist.get("Nirvana"), track.artist
+    track = Messier::Artist.get("Nirvana").albums.first.tracks.first
+    assert_equal Messier::Artist.get("Nirvana"), track.artist
   end
 
   def test_genre
-    track = Artist.get("Nirvana").albums.first.tracks.first
+    track = Messier::Artist.get("Nirvana").albums.first.tracks.first
     assert_equal "Grunge", track.genre.name
   end
 end

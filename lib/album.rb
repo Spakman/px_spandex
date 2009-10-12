@@ -5,29 +5,29 @@
 require "#{File.dirname(__FILE__)}/../lib/model"
 require "#{File.dirname(__FILE__)}/../lib/artist"
 
-class Album < Model
-  attr_reader :name, :artist
+module Messier
+  class Album < Model
+    attr_reader :name, :artist
 
-  def initialize(row)
-    @name = row['album']
-    @artist = Artist.new row
-    @query = @@table.prepare_query
-    @query.add_condition 'album', :equals, @name
-    @query.add_condition 'artist', :equals, @artist.name
-  end
-
-  def hash
-    (@name + @artist.name).hash
-  end
-
-  def tracks
-    tracks = []
-    @query.order_by 'track'
-    @query.run.each do |row|
-      tracks << Track.new(row)
+    def initialize(row)
+      @name = row['album']
+      @artist = Artist.new row
+      @query = @@table.prepare_query
+      @query.add_condition 'album', :equals, @name
+      @query.add_condition 'artist', :equals, @artist.name
     end
-    tracks.uniq
+
+    def hash
+      (@name + @artist.name).hash
+    end
+
+    def tracks
+      tracks = []
+      @query.order_by 'track'
+      @query.run.each do |row|
+        tracks << Track.new(row)
+      end
+      tracks.uniq
+    end
   end
 end
-
-

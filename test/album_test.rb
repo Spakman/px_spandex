@@ -14,15 +14,15 @@ class AlbumTest < Test::Unit::TestCase
   end
 
   def test_all
-    assert_equal 2, Album.all.length
-    assert_equal "Hold Your Colour", Album.all.first.name
+    assert_equal 2, Messier::Album.all.length
+    assert_equal "Hold Your Colour", Messier::Album.all.first.name
   end
 
   def test_artist
-    assert_equal Artist.get("Pendulum"), Album.all.first.artist
+    assert_equal Messier::Artist.get("Pendulum"), Messier::Album.all.first.artist
   end
 
-# def test_tracks
-#   assert_equal Artist.get("Pendulum"), Album.all.first.artist
-# end
+  def test_tracks
+    assert_equal Messier::Artist.get("Pendulum"), Messier::Album.all.first.artist
+  end
 end
