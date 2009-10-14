@@ -107,6 +107,15 @@ class CardTest < Test::Unit::TestCase
     assert_equal [ SecondCard, 12 ], @application.load_card_called
   end
 
+  def test_button_handler_goes_to_another_card_with_dynamic_card_name
+    TestCard.top_right card: -> { @second_card }
+    @card = TestCard.new @socket, @application
+    assert @card.methods.include? :top_right
+    @second_card = :second_card
+    @card.top_right
+    assert_equal [ SecondCard, nil ], @application.load_card_called
+  end
+
   def test_button_handler_goes_to_another_card_with_dynamic_params
     TestCard.top_right :card => :second_card, params: -> { @dynamic }
     @card = TestCard.new @socket, @application

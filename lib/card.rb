@@ -43,7 +43,7 @@ class Card
   # [:back]
   #   A special case that takes no other options. Focus is given to the previous card.
   # [:card]
-  #   A symbol or string representation the class of the target Card. This is should be the underscored name of the class.
+  #   A symbol, string representation (or a Proc that returns one) the class of the target Card. This is should be the underscored name of the class.
   # [:method]
   #   A symbol or string of a method name within the current Card that is to be called.
   # [:params]
@@ -52,6 +52,7 @@ class Card
   # Option examples:
   #   top_left :back
   #   top_right :card => :artist_list
+  #   top_right card: -> { get_target_card_name }
   #   bottom_left :method => :remove_item
   #   bottom_right :card => :artist_list, params: -> { @current_thing }
   #   bottom_right :method => :remove_item, params: -> { @current_item }
@@ -63,12 +64,18 @@ class Card
       end
     elsif options[:card]
       define_method button do 
+        if options[:card].respond_to? :call
+          card = options[:card].call 
+        else
+          card = options[:card]
+        end
+
         if options[:params].respond_to? :call
           params = options[:params].call 
         else
           params = options[:params]
         end
-        @application.load_card eval(options[:card].to_s.capitalize.gsub(/_(\w)/) { |m| m[1].upcase }), params
+        @application.load_card eval(card.to_s.capitalize.gsub(/_(\w)/) { |m| m[1].upcase }), params
         respond_keep_focus
       end
     elsif options[:method]
