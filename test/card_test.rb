@@ -5,7 +5,7 @@ require "thread"
 require "#{File.dirname(__FILE__)}/../lib/card"
 
 class TestCard < Card
-  attr_reader :show_called, :top_left_called, :call_me_called, :call_me_params
+  attr_reader :show_called, :top_left_called, :call_me_called, :call_me_params, :lambda_called
   attr_accessor :dynamic
 
   def initialize(socket, application)
@@ -110,16 +110,22 @@ class CardTest < Test::Unit::TestCase
   def test_button_handler_goes_to_another_card_with_dynamic_card_name
     TestCard.top_right card: -> { @second_card }
     @card = TestCard.new @socket, @application
-    assert @card.methods.include? :top_right
-    @second_card = :second_card
+    @card.instance_eval "@second_card = :second_card"
     @card.top_right
     assert_equal [ SecondCard, nil ], @application.load_card_called
+  end
+
+  def test_button_handler_with_dynamic_card_name_uses_instance_context
+    TestCard.top_right card: -> { @second_card }
+    @card = TestCard.new @socket, @application
+    @second_card = :second_card
+    @card.top_right
+    assert_equal [ nil, nil ], @application.load_card_called
   end
 
   def test_button_handler_goes_to_another_card_with_dynamic_params
     TestCard.top_right :card => :second_card, params: -> { @dynamic }
     @card = TestCard.new @socket, @application
-    assert @card.methods.include? :top_right
     @dynamic = "this was a lambda"
     @card.top_right
     assert_equal [ SecondCard, @dynamic ], @application.load_card_called
@@ -131,19 +137,30 @@ class CardTest < Test::Unit::TestCase
   def test_button_handler_call_method_in_same_card
     TestCard.top_right :method => :call_me
     @card = TestCard.new @socket, @application
-    assert @card.methods.include? :top_right
     @card.top_right
     assert_nil @application.load_card_called
     assert_equal 1, @card.call_me_called
   end
 
+  def test_button_handler_call_method_with_lambda_parameter
+    TestCard.top_right method: -> { @lambda_called = "lamb is tasty" }
+    @card = TestCard.new @socket, @application
+    @card.top_right
+    assert_equal "lamb is tasty", @card.lambda_called
+  end
+
+  def test_button_handler_call_method_with_lambda_parameter_with_parameters
+    TestCard.top_right method: ->(v) { @lambda_called = v }, :params => "lamb is tasty"
+    @card = TestCard.new @socket, @application
+    @card.top_right
+    assert_equal "lamb is tasty", @card.lambda_called
+  end
+
   def test_button_handler_call_method_with_params
     TestCard.top_right :method => :call_me, params: -> { @dynamic }
     @card = TestCard.new @socket, @application
-    assert @card.methods.include? :top_right
     @dynamic = "this was a lambda"
     @card.top_right
-    assert_nil @application.load_card_called
     assert_equal 1, @card.call_me_called
     assert_equal @dynamic, @card.call_me_params
   end

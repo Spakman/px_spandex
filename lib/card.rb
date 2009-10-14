@@ -29,6 +29,27 @@ class Card
     setup_button_handler __method__, options
   end
 
+  # Defines what should happen when the jog wheel is turned anti-clockwise.
+  #
+  # Calls Card.setup_button_handler
+  def self.jog_wheel_left(options)
+    setup_button_handler __method__, options
+  end
+
+  # Defines what should happen when the jog wheel is turned clockwise.
+  #
+  # Calls Card.setup_button_handler
+  def self.jog_wheel_right(options)
+    setup_button_handler __method__, options
+  end
+
+  # Defines what should happen when the jog wheel button is pressed.
+  #
+  # Calls Card.setup_button_handler
+  def self.jog_wheel_button(options)
+    setup_button_handler __method__, options
+  end
+
   # Defines what should happen when the bottom right button is pressed.
   #
   # Calls Card.setup_button_handler
@@ -56,6 +77,9 @@ class Card
   #   bottom_left :method => :remove_item
   #   bottom_right :card => :artist_list, params: -> { @current_thing }
   #   bottom_right :method => :remove_item, params: -> { @current_item }
+  #
+  # TODO: check and warn when passing :card and :method that only one is allowed?
+  # TODO: when :card is a Proc, it cannot take any arguments. Is this the desired behaviour?
   def self.setup_button_handler(button, options)
     if options == :back
       define_method button do
@@ -65,7 +89,7 @@ class Card
     elsif options[:card]
       define_method button do 
         if options[:card].respond_to? :call
-          card = options[:card].call 
+          card = instance_eval &options[:card]
         else
           card = options[:card]
         end
@@ -85,7 +109,15 @@ class Card
         else
           params = options[:params]
         end
-        send options[:method], params
+        if options[:method].respond_to? :call
+          if options[:method].arity == 0
+            instance_eval &options[:method]
+          else
+            instance_exec params, &options[:method]
+          end
+        else
+          send options[:method], params
+        end
         respond_keep_focus
       end
     end
