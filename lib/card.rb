@@ -1,36 +1,43 @@
 require "#{File.dirname(__FILE__)}/message"
 
 class Card
+  attr_accessor :params
+
   def initialize(socket, application)
     @socket = socket
     @application = application
   end
 
-  def self.top_left(symbol)
-    setup_button_handler __method__, symbol
+  def self.top_left(options)
+    setup_button_handler __method__, options
   end
 
-  def self.top_right(symbol)
-    setup_button_handler __method__, symbol
+  def self.top_right(options)
+    setup_button_handler __method__, options
   end
 
-  def self.bottom_left(symbol)
-    setup_button_handler __method__, symbol
+  def self.bottom_left(options)
+    setup_button_handler __method__, options
   end
 
-  def self.bottom_right(symbol)
-    setup_button_handler __method__, symbol
+  def self.bottom_right(options)
+    setup_button_handler __method__, options
   end
 
-  def self.setup_button_handler(button, symbol)
-    if symbol == :back
+  def self.setup_button_handler(button, options)
+    if options == :back
       define_method button do
         @application.previous_card
         respond_keep_focus
       end
-    else
-      define_method button do
-        @application.load_card eval(symbol.to_s.capitalize.gsub(/_(\w)/) { |m| m[1].upcase })
+    elsif options[:card]
+      define_method button do 
+        if options[:params].respond_to? :call
+          params = options[:params].call 
+        else
+          params = options[:params]
+        end
+        @application.load_card eval(options[:card].to_s.capitalize.gsub(/_(\w)/) { |m| m[1].upcase }), params
         respond_keep_focus
       end
     end

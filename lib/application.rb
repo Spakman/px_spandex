@@ -13,8 +13,9 @@ class Application
     end
   end
 
-  def load_card(klass)
+  def load_card(klass, params = nil)
     @cards << klass.new(@socket, self)
+    @cards.last.params = params
     @cards.last.show
   end
 

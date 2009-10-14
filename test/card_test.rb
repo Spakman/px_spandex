@@ -6,6 +6,7 @@ require "#{File.dirname(__FILE__)}/../lib/card"
 
 class TestCard < Card
   attr_reader :show_called, :top_left_called
+  attr_accessor :dynamic
 
   def initialize(socket, application)
     @show_called = @top_left_called = 0
@@ -25,8 +26,8 @@ class FakeApplication
     @previous_card_called = 1
   end
 
-  def load_card(card)
-    @load_card_called = card
+  def load_card(klass, params = nil)
+    @load_card_called = [ klass, params ]
   end
 end
 
@@ -85,11 +86,31 @@ class CardTest < Test::Unit::TestCase
     assert_equal 1, @application.previous_card_called
   end
 
-  def test_button_handler_goes_to_another_card
-    TestCard.top_right :second_card
+  def test_button_handler_goes_to_another_card_without_params
+    TestCard.top_right :card => :second_card
     @card = TestCard.new @socket, @application
     assert @card.methods.include? :top_right
     @card.top_right
-    assert_equal SecondCard, @application.load_card_called
+    assert_equal [ SecondCard, nil ], @application.load_card_called
+  end
+
+  def test_button_handler_goes_to_another_card_with_params
+    TestCard.top_right :card => :second_card, :params => 12
+    @card = TestCard.new @socket, @application
+    assert @card.methods.include? :top_right
+    @card.top_right
+    assert_equal [ SecondCard, 12 ], @application.load_card_called
+  end
+
+  def test_button_handler_goes_to_another_card_with_dynamic_params
+    TestCard.top_right :card => :second_card, params: -> { @dynamic }
+    @card = TestCard.new @socket, @application
+    assert @card.methods.include? :top_right
+    @dynamic = "this was a lambda"
+    @card.top_right
+    assert_equal [ SecondCard, "this was a lambda" ], @application.load_card_called
+    @dynamic = "this was a lambda"
+    @card.top_right
+    assert_equal [ SecondCard, "this was a lambda" ], @application.load_card_called
   end
 end

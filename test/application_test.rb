@@ -13,6 +13,7 @@ module Kernel
 end
 
 class MyCard
+  attr_accessor :params
   attr_reader :show_called, :messages_received
   def initialize(socket, application)
     @show_called = 0
@@ -62,11 +63,20 @@ class ApplicationTest < Test::Unit::TestCase
     assert_equal 1, @application.cards.last.show_called
   end
 
-  def test_load_card
+  def test_load_card_without_params
     @application.load_card MySecondCard
     assert_equal 2, @application.cards.length
     assert_instance_of MySecondCard, @application.cards.last
     assert_equal 1, @application.cards.last.show_called
+    assert_nil @application.cards.last.params
+  end
+
+  def test_load_card_with_params
+    @application.load_card MySecondCard, 123
+    assert_equal 2, @application.cards.length
+    assert_instance_of MySecondCard, @application.cards.last
+    assert_equal 1, @application.cards.last.show_called
+    assert_equal 123, @application.cards.last.params
   end
 
   def test_previous_card
