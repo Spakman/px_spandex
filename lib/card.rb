@@ -7,6 +7,7 @@ require "#{File.dirname(__FILE__)}/message"
 class Card
   attr_accessor :params
 
+  # Creates a new Card.
   def initialize(socket, application)
     @socket = socket
     @application = application
@@ -61,7 +62,8 @@ class Card
     setup_button_handler __method__, options
   end
 
-  # Is used by Card.top_left and friends to define methods like Card#top_left which are called when the Card receives input events.
+  # Is used by Card.top_left and friends to define methods like Card#top_left
+  # which are called when the Card receives input events.
   #
   # === Options
   #
@@ -82,8 +84,10 @@ class Card
   #   bottom_right :card => :artist_list, params: -> { @current_thing }
   #   bottom_right :method => :remove_item, params: -> { @current_item }
   #
-  # TODO: check and warn when passing :card and :method that only one is allowed?
-  # TODO: when :card is a Proc, it cannot take any arguments. Is this the desired behaviour?
+  # TODO: check and warn when passing :card and :method that only one is
+  #       allowed?
+  # TODO: when :card is a Proc, it cannot take any arguments. Is this the
+  #       desired behaviour?
   def self.setup_button_handler(button, options)
     if options == :back
       define_method button do
@@ -92,38 +96,38 @@ class Card
       end
     elsif options[:card]
       define_method button do 
-        if options[:card].respond_to? :call
-          card = instance_eval &options[:card]
-        else
-          card = options[:card]
-        end
+        card = call_proc_in_instance options[:card]
+        params = call_proc_in_instance options[:params]
 
-        if options[:params].respond_to? :call
-          params = instance_eval &options[:params]
-        else
-          params = options[:params]
-        end
         @application.load_card eval(card.to_s.capitalize.gsub(/_(\w)/) { |m| m[1].upcase }), params
         respond_keep_focus
       end
     elsif options[:method]
       define_method button do 
-        if options[:params].respond_to? :call
-          params = options[:params].call 
-        else
-          params = options[:params]
-        end
+
+        params = call_proc_in_instance options[:params]
+
         if options[:method].respond_to? :call
-          if options[:method].arity == 0
-            instance_eval &options[:method]
-          else
-            instance_exec params, &options[:method]
-          end
+          call_proc_in_instance options[:method], params
         else
           send options[:method], params
         end
         respond_keep_focus
       end
+    end
+  end
+
+  # Returns the result of calling proc_or_not in the context of the instance. 
+  # If option is not a Proc, it is simply returned.
+  def call_proc_in_instance(proc_or_not, proc_params = nil)
+    if proc_or_not.respond_to? :call
+      if proc_or_not.arity == 0
+        instance_eval &proc_or_not
+      else
+        instance_exec proc_params, &proc_or_not
+      end
+    else
+      proc_or_not
     end
   end
 

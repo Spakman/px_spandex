@@ -156,9 +156,9 @@ class CardTest < Test::Unit::TestCase
   def test_button_handler_call_method_with_params
     TestCard.top_right :method => :call_me, params: -> { @dynamic }
     @card = TestCard.new @socket, @application
-    @dynamic = "this was a lambda"
+    @card.instance_eval "@dynamic = 'this was a lambda'"
     @card.top_right
     assert_equal 1, @card.call_me_called
-    assert_equal @dynamic, @card.call_me_params
+    assert_equal "this was a lambda", @card.call_me_params
   end
 end

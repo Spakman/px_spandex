@@ -4,6 +4,7 @@
 
 require "#{File.dirname(__FILE__)}/../lib/model"
 require "#{File.dirname(__FILE__)}/../lib/artist"
+require "#{File.dirname(__FILE__)}/../lib/track"
 
 module Messier
   class Album < Model
