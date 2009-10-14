@@ -24,5 +24,9 @@ module Messier
     def hash
       (@name + @album.name + @artist.name).hash
     end
+
+    def to_s
+      @name
+    end
   end
 end

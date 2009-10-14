@@ -126,12 +126,9 @@ class CardTest < Test::Unit::TestCase
   def test_button_handler_goes_to_another_card_with_dynamic_params
     TestCard.top_right :card => :second_card, params: -> { @dynamic }
     @card = TestCard.new @socket, @application
-    @dynamic = "this was a lambda"
+    @card.instance_eval "@dynamic = 'this was a lambda'"
     @card.top_right
-    assert_equal [ SecondCard, @dynamic ], @application.load_card_called
-    @dynamic = "this was another lambda"
-    @card.top_right
-    assert_equal [ SecondCard, @dynamic ], @application.load_card_called
+    assert_equal [ SecondCard, "this was a lambda" ], @application.load_card_called
   end
 
   def test_button_handler_call_method_in_same_card

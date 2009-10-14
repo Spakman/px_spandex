@@ -29,5 +29,9 @@ module Messier
       end
       tracks.uniq
     end
+
+    def to_s
+      @name
+    end
   end
 end

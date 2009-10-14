@@ -27,5 +27,9 @@ module Messier
       end
       albums.uniq
     end
+
+    def to_s
+      @name
+    end
   end
 end

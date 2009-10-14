@@ -25,4 +25,8 @@ class AlbumTest < Test::Unit::TestCase
   def test_tracks
     assert_equal Messier::Artist.get("Pendulum"), Messier::Album.all.first.artist
   end
+
+  def test_to_s
+    assert_equal "Nevermind", Messier::Album.all.last.to_s
+  end
 end

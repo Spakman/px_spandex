@@ -2,6 +2,8 @@
 # Released under the General Public License (GPL) version 3.
 # See COPYING
 
+require "rufus/tokyo"
+
 module Messier
   class Model
     @@table = Rufus::Tokyo::Table.new(TABLE_FILEPATH)

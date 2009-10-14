@@ -95,7 +95,7 @@ class Card
         end
 
         if options[:params].respond_to? :call
-          params = options[:params].call 
+          params = instance_eval &options[:params]
         else
           params = options[:params]
         end

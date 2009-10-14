@@ -31,4 +31,8 @@ class ArtistTest < Test::Unit::TestCase
     assert_equal 1, Messier::Artist.get("Pendulum").albums.length
     assert_equal "Hold Your Colour", Messier::Artist.get("Pendulum").albums.first.name
   end
+
+  def test_to_s
+    assert_equal "Nirvana", Messier::Artist.get("Nirvana").to_s
+  end
 end
