@@ -2,6 +2,7 @@
 # Released under the General Public License (GPL) version 3.
 # See COPYING
 
+# A class for handling circular lists for use in Honcho talking applications.
 class List
   def initialize(items)
     @items = items
