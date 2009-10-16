@@ -2,7 +2,7 @@ require "test/unit"
 require "socket"
 require "fileutils"
 require "thread"
-require "#{File.dirname(__FILE__)}/../lib/application"
+require_relative "../lib/application"
 
 module Kernel
   def exit

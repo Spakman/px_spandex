@@ -2,7 +2,7 @@ require "test/unit"
 require "socket"
 require "fileutils"
 require "thread"
-require "#{File.dirname(__FILE__)}/../lib/card"
+require_relative "../lib/card"
 
 class TestCard < Card
   attr_reader :show_called, :top_left_called, :call_me_called, :call_me_params, :lambda_called

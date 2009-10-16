@@ -1,6 +1,6 @@
 require "rubygems"
 require "test/unit"
-require "#{File.dirname(__FILE__)}/../lib/list"
+require_relative "../lib/list"
 
 class ListTest < Test::Unit::TestCase
   def setup

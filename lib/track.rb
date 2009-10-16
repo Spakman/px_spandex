@@ -2,9 +2,9 @@
 # Released under the General Public License (GPL) version 3.
 # See COPYING
 
-require "#{File.dirname(__FILE__)}/../lib/model"
-require "#{File.dirname(__FILE__)}/../lib/artist"
-require "#{File.dirname(__FILE__)}/../lib/genre"
+require_relative "model"
+require_relative "artist"
+require_relative "genre"
 
 module Messier
   class Track < Model

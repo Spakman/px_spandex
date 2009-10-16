@@ -1,8 +1,8 @@
 require "rubygems"
 require "rufus/tokyo"
 require "test/unit"
-require "#{File.dirname(__FILE__)}/test_helper"
-require "#{File.dirname(__FILE__)}/../lib/album"
+require_relative "test_helper"
+require_relative "../lib/album"
 
 class AlbumTest < Test::Unit::TestCase
   def setup

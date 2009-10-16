@@ -2,8 +2,8 @@
 # Released under the General Public License (GPL) version 3.
 # See COPYING
 
-require "#{File.dirname(__FILE__)}/../lib/model"
-require "#{File.dirname(__FILE__)}/../lib/album"
+require_relative "model"
+require_relative "album"
 
 module Messier
   class Artist < Model
