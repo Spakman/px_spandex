@@ -2,7 +2,7 @@
 # Released under the General Public License (GPL) version 3.
 # See COPYING
 
-require "#{File.dirname(__FILE__)}/message"
+require "honcho/message"
 
 class Card
   attr_accessor :params
@@ -110,7 +110,12 @@ class Card
         if options[:method].respond_to? :call
           call_proc_in_instance options[:method], params
         else
-          send options[:method], params
+          meth = method options[:method]
+          if meth.arity == 0
+            send options[:method]
+          else
+            send options[:method], params
+          end
         end
         respond_keep_focus
       end

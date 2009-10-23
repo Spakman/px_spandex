@@ -2,14 +2,15 @@ require "test/unit"
 require "socket"
 require "fileutils"
 require "thread"
+require_relative "test_helper"
 require_relative "../lib/card"
 
 class TestCard < Card
-  attr_reader :show_called, :top_left_called, :call_me_called, :call_me_params, :lambda_called
+  attr_reader :show_called, :top_left_called, :call_me_called, :call_me_params, :call_me_no_params_called, :lambda_called
   attr_accessor :dynamic
 
   def initialize(socket, application)
-    @show_called = @top_left_called = @call_me_called = 0
+    @show_called = @top_left_called = @call_me_called = @call_me_no_params_called = 0
     super
   end
 
@@ -20,6 +21,10 @@ class TestCard < Card
   def call_me(params = nil)
     @call_me_called += 1
     @call_me_params = params
+  end
+
+  def call_me_no_params
+    @call_me_no_params_called += 1
   end
 end
 
@@ -132,11 +137,11 @@ class CardTest < Test::Unit::TestCase
   end
 
   def test_button_handler_call_method_in_same_card
-    TestCard.top_right :method => :call_me
+    TestCard.top_right :method => :call_me_no_params
     @card = TestCard.new @socket, @application
     @card.top_right
     assert_nil @application.load_card_called
-    assert_equal 1, @card.call_me_called
+    assert_equal 1, @card.call_me_no_params_called
   end
 
   def test_button_handler_call_method_with_lambda_parameter
