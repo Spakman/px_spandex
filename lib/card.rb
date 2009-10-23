@@ -11,6 +11,11 @@ class Card
   def initialize(socket, application)
     @socket = socket
     @application = application
+    @responded = false
+  end
+
+  def already_responded?
+    @responded
   end
 
   # Defines what should happen when the top left button is pressed.
@@ -137,6 +142,7 @@ class Card
   end
 
   def receive_message(message)
+    @responded = false
     case message.type
     when :havefocus
       show
@@ -146,8 +152,18 @@ class Card
     end
   end
 
+  def pass_focus(options)
+    unless already_responded?
+      @socket << Honcho::Message.new(:passfocus, options)
+      @responded = true
+    end
+  end
+
   def respond_keep_focus
-    @socket << Honcho::Message.new(:keepfocus)
+    unless already_responded?
+      @socket << Honcho::Message.new(:keepfocus)
+      @responded = true
+    end
   end
 
   def render(markup)

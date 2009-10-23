@@ -1,3 +1,4 @@
+$LOAD_PATH.unshift "#{ENV['PROJECT_X_BASE']}/lib/"
 require "fileutils"
 
 TABLE_FILEPATH = "#{File.dirname(__FILE__)}/testtable.tct"

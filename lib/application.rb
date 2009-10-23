@@ -2,7 +2,7 @@
 # Released under the General Public License (GPL) version 3.
 # See COPYING
 
-require "#{File.dirname(__FILE__)}/message"
+require "honcho/message"
 
 class Application
   def initialize
