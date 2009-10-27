@@ -24,7 +24,7 @@ module Messier
 
     def tracks
       tracks = []
-      @query.order_by 'track'
+      @query.order_by 'track_nr'
       @query.run.each do |row|
         tracks << Track.new(row)
       end

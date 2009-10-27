@@ -10,7 +10,7 @@ class TrackTest < Test::Unit::TestCase
   end
 
   def test_all
-    assert_equal 2, Messier::Track.all.length
+    assert_equal 5, Messier::Track.all.length
     assert_equal "In Bloom", Messier::Artist.get("Nirvana").albums.first.tracks.first.name
   end
 
