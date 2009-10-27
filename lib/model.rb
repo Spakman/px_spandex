@@ -6,7 +6,7 @@ require "rufus/tokyo"
 
 module Messier
   class Model
-    @@table = Rufus::Tokyo::Table.new(TABLE_FILEPATH)
+    @@table = Rufus::Tokyo::Table.new(TABLE_FILEPATH, :mode => 'r')
 
     def hash
       @name.hash
@@ -21,7 +21,7 @@ module Messier
     end
 
     def self.open_table
-      @@table = Rufus::Tokyo::Table.new(TABLE_FILEPATH)
+      @@table = Rufus::Tokyo::Table.new(TABLE_FILEPATH, :mode => 'r')
     end
 
     def ==(object)
