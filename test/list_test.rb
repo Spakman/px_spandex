@@ -33,6 +33,11 @@ class ListTest < Test::Unit::TestCase
     assert_equal 2, @list.starting_item
   end
 
+  def test_selected_to_end
+    @list.instance_eval "@selected_index = 3"
+    assert_equal %w( Latest Never Playlists ), @list.selected_to_end
+  end
+
   def test_select_next_incrementing_starting_index
     @list.instance_eval "@selected_index = 2"
     assert_equal "Latest", @list.select_next

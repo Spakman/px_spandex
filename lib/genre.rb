@@ -29,6 +29,15 @@ module Messier
       albums.uniq
     end
 
+    def artists
+      artists = []
+      @query.order_by 'artist'
+      @query.run.each do |row|
+        artists << Artist.new(row)
+      end
+      artists.uniq
+    end
+
     def to_s
       @name
     end

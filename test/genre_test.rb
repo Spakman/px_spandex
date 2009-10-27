@@ -18,6 +18,10 @@ class GenreTest < Test::Unit::TestCase
     assert_equal "Grunge", Messier::Artist.get("Nirvana").albums.first.tracks.first.genre.name
   end
 
+  def test_artists
+    assert_equal [ Messier::Artist.get("Nirvana") ], Messier::Artist.get("Nirvana").albums.first.tracks.first.genre.artists
+  end
+
   def test_to_s
     assert_equal "Grunge", Messier::Artist.get("Nirvana").albums.first.tracks.first.genre.to_s
   end

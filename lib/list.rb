@@ -36,6 +36,10 @@ class List
     @items[@selected_index]
   end
 
+  def selected_to_end
+    @items[@selected_index..@items.length-1]
+  end
+
   def to_s
 #   puts "starting at #{@starting_item} (#{@items[@starting_item]})   and selected #{@selected_index} (#{@items[@selected_index]})"
     list = "<list>\n"
