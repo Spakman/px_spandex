@@ -68,7 +68,7 @@ class Tracks < ListCard
 
   def play
     ids = @list.selected_to_end.map { |t| t.id }
-    pass_focus(application: "mozart", method: "play_ids", params: ids.join(", "))
+    pass_focus(application: "mozart", method: "play_ids", params: ids.join(","))
   end
 
   def show
