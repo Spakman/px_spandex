@@ -1,0 +1,86 @@
+#!/scratch/bin/ruby
+
+$0 = "messier"
+$LOAD_PATH.unshift "#{ENV["PROJECT_X_BASE"]}/lib/"
+
+TABLE_FILEPATH = "#{ENV['HOME']}/src/project-x/messier/project-x-musicdb.tct"
+require "socket"
+require "messier/application"
+require "messier/card"
+require "messier/list"
+require "messier/artist"
+
+class ListCard < Card
+  jog_wheel_left method: -> { @list.select_previous; show }
+  jog_wheel_right method: -> { @list.select_next; show }
+  jog_wheel_button card: -> { @list.selected }
+end
+
+class Menu < ListCard
+  top_left :back
+
+  ITEMS = %w( Artists Genres Playlists )
+
+  def show
+    @list ||= List.new ITEMS
+    render "<button position=top_left>Back</button><title>Mark's music</title>#{@list}"
+  end
+end
+
+class Genres < ListCard
+  top_left :back
+  jog_wheel_button :card => 'artists', params: -> { @list.selected }
+
+  def show
+    @list ||= List.new Messier::Genre.all
+    render "<button position=top_left>Back</button><title>Genres</title>#{@list}"
+  end
+end
+
+class Artists < ListCard
+  top_left :back
+  jog_wheel_button :card => 'albums', params: -> { @list.selected }
+
+  def show
+    @list ||= List.new Messier::Artist.all
+    render "<button position=top_left>Back</button><title>Artists</title>#{@list}"
+  end
+end
+
+class Albums < ListCard
+  top_left :back
+  jog_wheel_button :card => 'tracks', params: -> { @list.selected }
+
+  def show
+    @list ||= List.new @params.albums
+    render "<button position=top_left>Back</button><title>Albums</title>#{@list}"
+  end
+end
+
+class Tracks < ListCard
+  top_left :back
+  jog_wheel_button :method => :play
+
+  def play
+    pass_focus(application: "mozart", method: "play_ids", params: @list.selected.id)
+  end
+
+  def show
+    @list ||= List.new @params.tracks
+    render "<button position=top_left>Back</button><title>Tracks</title>#{@list}"
+  end
+end
+
+class Playlists < Card
+  top_left :back
+
+  def show
+    render "<button position=top_left>Back</button><title>Playlists</title><text x=20 y=30>No playlists defined</text>"
+  end
+end
+
+class Messier::Messier < Application
+  entry_point :menu
+end
+
+Messier::Messier.new.run
