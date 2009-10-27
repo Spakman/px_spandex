@@ -10,7 +10,7 @@ require "messier/card"
 require "messier/list"
 require "messier/artist"
 
-class ListCard < Card
+class ListCard < Spandex::Card
   jog_wheel_left method: -> { @list.select_previous; show }
   jog_wheel_right method: -> { @list.select_next; show }
   jog_wheel_button card: -> { @list.selected }
@@ -22,7 +22,7 @@ class Menu < ListCard
   ITEMS = %w( Artists Genres Playlists )
 
   def show
-    @list ||= List.new ITEMS
+    @list ||= Spandex::List.new ITEMS
     render "<button position=top_left>Back</button><title>Mark's music</title>#{@list}"
   end
 end
@@ -32,7 +32,7 @@ class Genres < ListCard
   jog_wheel_button :card => 'artists', params: -> { @list.selected }
 
   def show
-    @list ||= List.new Messier::Genre.all
+    @list ||= Spandex::List.new Messier::Genre.all
     render "<button position=top_left>Back</button><title>Genres</title>#{@list}"
   end
 end
@@ -43,10 +43,10 @@ class Artists < ListCard
 
   def show
     if @params
-      @list ||= List.new @params.artists
+      @list ||= Spandex::List.new @params.artists
       @params = nil
     else
-      @list ||= List.new Messier::Artist.all
+      @list ||= Spandex::List.new Messier::Artist.all
     end
     render "<button position=top_left>Back</button><title>Artists</title>#{@list}"
   end
@@ -57,7 +57,7 @@ class Albums < ListCard
   jog_wheel_button :card => 'tracks', params: -> { @list.selected }
 
   def show
-    @list ||= List.new @params.albums
+    @list ||= Spandex::List.new @params.albums
     render "<button position=top_left>Back</button><title>Albums</title>#{@list}"
   end
 end
@@ -72,12 +72,12 @@ class Tracks < ListCard
   end
 
   def show
-    @list ||= List.new @params.tracks
+    @list ||= Spandex::List.new @params.tracks
     render "<button position=top_left>Back</button><title>Tracks</title>#{@list}"
   end
 end
 
-class Playlists < Card
+class Playlists < Spandex::Card
   top_left :back
 
   def show
@@ -85,7 +85,7 @@ class Playlists < Card
   end
 end
 
-class Messier::Messier < Application
+class Messier::Messier < Spandex::Application
   entry_point :menu
 end
 

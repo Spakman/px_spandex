@@ -5,7 +5,7 @@ require "thread"
 require_relative "test_helper"
 require_relative "../lib/card"
 
-class TestCard < Card
+class TestCard < Spandex::Card
   attr_reader :show_called, :top_left_called, :call_me_called, :call_me_params, :call_me_no_params_called, :lambda_called
   attr_accessor :dynamic
 

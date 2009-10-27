@@ -2,7 +2,7 @@ require "rubygems"
 require "test/unit"
 require_relative "../lib/list"
 
-class List
+class Spandex::List
   attr_reader :starting_item
   remove_const :NUMBER_OF_LIST_ITEMS_TO_DISPLAY
   NUMBER_OF_LIST_ITEMS_TO_DISPLAY = 3
@@ -11,7 +11,7 @@ end
 class ListTest < Test::Unit::TestCase
   def setup
     items = %w( Artists Genres Popular Latest Never Playlists )
-    @list = List.new items
+    @list = Spandex::List.new items
   end
 
   def test_selected

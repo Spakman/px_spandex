@@ -2,6 +2,7 @@ require "test/unit"
 require "socket"
 require "fileutils"
 require "thread"
+require_relative "test_helper"
 require_relative "../lib/application"
 
 module Kernel
@@ -31,7 +32,7 @@ end
 
 class MySecondCard < MyCard; end
 
-class TestApplication < Application
+class TestApplication < Spandex::Application
   attr_reader :cards, :socket
   entry_point :my_card
 end
