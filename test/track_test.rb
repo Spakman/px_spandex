@@ -9,10 +9,6 @@ class TrackTest < Test::Unit::TestCase
     setup_data
   end
 
-  def teardown
-    FileUtils.rm_f TABLE_FILEPATH
-  end
-
   def test_all
     assert_equal 2, Messier::Track.all.length
     assert_equal "In Bloom", Messier::Artist.get("Nirvana").albums.first.tracks.first.name

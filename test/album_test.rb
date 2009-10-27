@@ -9,10 +9,6 @@ class AlbumTest < Test::Unit::TestCase
     setup_data
   end
   
-  def teardown
-    FileUtils.rm_f TABLE_FILEPATH
-  end
-
   def test_all
     assert_equal 2, Messier::Album.all.length
     assert_equal "Hold Your Colour", Messier::Album.all.first.name

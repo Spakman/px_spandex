@@ -9,10 +9,6 @@ class ArtistTest < Test::Unit::TestCase
     setup_data
   end
 
-  def teardown
-    FileUtils.rm_f TABLE_FILEPATH
-  end
-
   def test_eql
     assert_equal Messier::Artist.new(artist: "Nirvana"), Messier::Artist.new(artist: "Nirvana")
   end
