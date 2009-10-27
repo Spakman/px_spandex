@@ -1,5 +1,4 @@
-require "rubygems"
-require "test/unit"
+require_relative "test_helper"
 require_relative "../lib/list"
 
 class Spandex::List
