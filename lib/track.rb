@@ -8,10 +8,11 @@ require_relative "genre"
 
 module Messier
   class Track < Model
-    attr_reader :name, :album, :artist, :genre
+    attr_reader :name, :album, :artist, :genre, :id
 
     def initialize(row)
       @name = row['track']
+      @id = row[:pk]
       @album = Album.new row
       @artist = Artist.new row
       @genre = Genre.new row

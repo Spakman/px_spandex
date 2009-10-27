@@ -21,6 +21,7 @@ class TrackTest < Test::Unit::TestCase
   def test_artist
     track = Messier::Artist.get("Nirvana").albums.first.tracks.first
     assert_equal Messier::Artist.get("Nirvana"), track.artist
+    assert_equal "pk0", track.id
   end
 
   def test_genre
