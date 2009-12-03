@@ -7,7 +7,7 @@ require "honcho/message"
 module Spandex
   class Application
     def initialize
-      @socket = UNIXSocket.open "/tmp/messier.socket"
+      @socket = UNIXSocket.open "/tmp/#{File.basename($0)}.socket"
       @cards = []
       load_card entry_point
     end

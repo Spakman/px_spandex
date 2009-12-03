@@ -3,6 +3,10 @@ require_relative "../lib/application"
 
 module Kernel
   def exit
+    begin
+      ApplicationTest.send :remove_method, :exit_called?
+    rescue NameError
+    end
     ApplicationTest.send :define_method, "exit_called?" do
       true
     end
@@ -35,7 +39,7 @@ end
 
 class ApplicationTest < Test::Unit::TestCase
   def setup
-    @socket_path = "/tmp/messier.socket"
+    @socket_path = "/tmp/#{File.basename($0)}.socket"
     FileUtils.rm_f @socket_path
     listening_socket = UNIXServer.open @socket_path
     listening_socket.listen 1
@@ -43,13 +47,18 @@ class ApplicationTest < Test::Unit::TestCase
       @socket = listening_socket.accept
     end
     @application = TestApplication.new
+    begin
+      self.class.send :remove_method, :exit_called?
+    rescue NameError
+    end
+
     self.class.send :define_method, "exit_called?" do
       false
     end
   end
 
   def teardown
-    @socket.close unless @socket.nil? or @socket.closed?
+    @socket.close if defined? @socket and not @socket.closed?
     FileUtils.rm_f @socket_path
   end
 

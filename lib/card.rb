@@ -19,6 +19,14 @@ module Spandex
       @responded
     end
 
+    def top_left; respond_keep_focus; end
+    def top_right; respond_keep_focus; end
+    def bottom_left; respond_keep_focus; end
+    def bottom_right; respond_keep_focus; end
+    def jog_wheel_button; respond_keep_focus; end
+    def jog_wheel_left; respond_keep_focus; end
+    def jog_wheel_right; respond_keep_focus; end
+
     # Defines what should happen when the top left button is pressed.
     #
     # Calls Card.setup_button_handler
@@ -169,6 +177,15 @@ module Spandex
 
     def render(markup)
       @socket << Honcho::Message.new(:render, markup)
+    end
+
+    def render_every(seconds, &block)
+      Thread.new do
+        loop do
+          render yield
+          sleep seconds
+        end
+      end
     end
   end
 end

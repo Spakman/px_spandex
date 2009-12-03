@@ -74,14 +74,17 @@ class CardTest < Test::Unit::TestCase
     assert_equal "<render #{markup.length}>\n#{markup}", @socket.bytes_written
   end
 
+  def test_render_every
+    @socket.bytes_written = ""
+    markup = "1"
+    @card.render_every(1) { markup }
+    sleep 1.5
+    assert_equal "<render #{markup.length}>\n#{markup}<render #{markup.length}>\n#{markup}", @socket.bytes_written
+  end
+
   def test_receive_havefocus_message
     @card.receive_message Honcho::Message.new(:havefocus, nil) 
     assert_equal 1, @card.show_called
-  end
-
-  def test_receive_inputevent_message
-    # we haven't defined a top_left method yet, so this should throw an error.
-    assert_raises(NoMethodError) { @card.receive_message Honcho::Message.new(:inputevent, "top_left") }
   end
 
   def test_button_handler_goes_to_previous_card
