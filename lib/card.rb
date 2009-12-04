@@ -13,7 +13,10 @@ module Spandex
       @socket = socket
       @application = application
       @responded = false
+      after_initialize
     end
+
+    def after_initialize; end
 
     def already_responded?
       @responded
@@ -187,5 +190,11 @@ module Spandex
         end
       end
     end
+  end
+
+  class ListCard < Card
+    jog_wheel_left method: -> { @list.select_previous; show }
+    jog_wheel_right method: -> { @list.select_next; show }
+    jog_wheel_button card: -> { @list.selected }
   end
 end

@@ -2,6 +2,7 @@
 # Released under the General Public License (GPL) version 3.
 # See COPYING
 
+require "socket"
 require "honcho/message"
 
 module Spandex
@@ -12,9 +13,15 @@ module Spandex
       load_card entry_point
     end
 
-    def self.entry_point(symbol)
-      define_method :entry_point do
-        eval symbol.to_s.capitalize.gsub(/_(\w)/) { |m| m[1].upcase }
+    def self.entry_point(param)
+      if param.kind_of? Symbol
+        define_method :entry_point do
+          eval param.to_s.capitalize.gsub(/_(\w)/) { |m| m[1].upcase }
+        end
+      else
+        define_method :entry_point do
+          eval param
+        end
       end
     end
 
