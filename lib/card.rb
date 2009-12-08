@@ -139,6 +139,12 @@ module Spandex
       end
     end
 
+    # Convenience method.
+    def load_card(card, params = nil)
+      load_card card, params
+      respond_keep_focus
+    end
+
     # Returns the result of calling proc_or_not in the context of the instance. 
     # If option is not a Proc, it is simply returned.
     def call_proc_in_instance(proc_or_not, proc_params = nil)
