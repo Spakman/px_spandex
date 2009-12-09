@@ -187,8 +187,15 @@ module Spandex
       end
     end
 
+    # Creates a Honcho message from the supplied markup and
+    # sends it down the pipe. Rescues EPIPE errors since we may
+    # be tring to render from a thread that isn't aware the
+    # socket has closed.
     def render(markup)
-      @socket << Honcho::Message.new(:render, markup)
+      begin
+        @socket << Honcho::Message.new(:render, markup)
+      rescue Errno::EPIPE
+      end
     end
 
     def render_every(seconds, &block)

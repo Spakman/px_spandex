@@ -5,6 +5,7 @@
 module Spandex
   # A class for handling circular lists for use in Honcho talking applications.
   class List
+    attr_reader :items
     NUMBER_OF_LIST_ITEMS_TO_DISPLAY = 5
 
     def initialize(items)
