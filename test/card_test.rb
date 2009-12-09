@@ -103,6 +103,14 @@ class CardTest < Test::Unit::TestCase
     assert_equal [ SecondCard, nil ], @application.load_card_called
   end
 
+  def test_button_handler_goes_to_another_card_using_classname
+    TestCard.top_right :card => SecondCard
+    @card = TestCard.new @socket, @application
+    assert @card.methods.include? :top_right
+    @card.top_right
+    assert_equal [ SecondCard, nil ], @application.load_card_called
+  end
+
   def test_button_handler_goes_to_another_card_with_params
     TestCard.top_right :card => :second_card, :params => 12
     @card = TestCard.new @socket, @application

@@ -114,9 +114,12 @@ module Spandex
       elsif options[:card]
         define_method button do 
           card = call_proc_in_instance options[:card]
+          unless card.kind_of? Class
+            card = eval(card.to_s.capitalize.gsub(/_(\w)/) { |m| m[1].upcase })
+          end
           params = call_proc_in_instance options[:params]
 
-          @application.load_card eval(card.to_s.capitalize.gsub(/_(\w)/) { |m| m[1].upcase }), params
+          @application.load_card card, params
           respond_keep_focus
         end
       elsif options[:method]
@@ -141,7 +144,7 @@ module Spandex
 
     # Convenience method.
     def load_card(card, params = nil)
-      load_card card, params
+      @application.load_card card, params
       respond_keep_focus
     end
 
