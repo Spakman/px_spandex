@@ -172,7 +172,7 @@ module Spandex
       @responded
     end
 
-    def pass_focus(options)
+    def pass_focus(options = nil)
       unless already_responded?
         @socket << Honcho::Message.new(:passfocus, options)
         @responded = true
