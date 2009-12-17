@@ -17,11 +17,6 @@ module Spandex
     end
 
     def after_initialize; end
-
-    def already_responded?
-      @responded
-    end
-
     def top_left; respond_keep_focus; end
     def top_right; respond_keep_focus; end
     def bottom_left; respond_keep_focus; end
@@ -171,6 +166,10 @@ module Spandex
       when :inputevent
         send message.body.chomp.to_sym
       end
+    end
+
+    def already_responded?
+      @responded
     end
 
     def pass_focus(options)

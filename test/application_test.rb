@@ -34,7 +34,7 @@ class MySecondCard < MyCard; end
 
 class TestApplication < Spandex::Application
   attr_reader :cards, :socket
-  entry_point :my_card
+  entry_point MyCard
 end
 
 class ApplicationTest < Test::Unit::TestCase

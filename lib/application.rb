@@ -13,15 +13,9 @@ module Spandex
       load_card entry_point
     end
 
-    def self.entry_point(param)
-      if param.kind_of? Symbol
-        define_method :entry_point do
-          eval param.to_s.capitalize.gsub(/_(\w)/) { |m| m[1].upcase }
-        end
-      else
-        define_method :entry_point do
-          eval param
-        end
+    def self.entry_point(klass)
+      define_method :entry_point do
+        klass
       end
     end
 
@@ -49,9 +43,9 @@ module Spandex
         rescue Errno::ECONNRESET, Errno::EBADF, IOError
           break
         end
-        if header =~ /^<(\w+) (\d+)>\n$/
-          body = @socket.read $2.to_i
-          message = Honcho::Message.new $1, body
+        if header =~ /^<(?<type>\w+) (?<length>\d+)>\n$/
+          body = @socket.read $~[:length].to_i
+          message = Honcho::Message.new $~[:type], body
           @cards.last.receive_message message
         end
       end
