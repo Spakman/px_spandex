@@ -41,13 +41,16 @@ class Test::Unit::CardTestCase < Test::Unit::TestCase
     @card = card.new @socket_string, @application
   end
 
+  # Returns the rendered string.
   def rendered
     @socket_string.sub /^<render \d+>\n/, ""
   end
 
-  def assert_card(card, params = nil)
-    message = "Expected active Card to be #{card}, but it was #{@application.cards.last}"
-    assert_equal @application.cards.last.class, card
+  # Checks that the passed card_klass is active and that any supplied
+  # parameters were passed.
+  def assert_card(card_klass, params = nil)
+    message = "Expected active Card to be #{card_klass}, but it was #{@application.cards.last}"
+    assert_equal @application.cards.last.class, card_klass
 
     if params
       message = "Expected card params to be #{params}, but they were #{@application.cards.last.params}."
@@ -55,25 +58,27 @@ class Test::Unit::CardTestCase < Test::Unit::TestCase
     end
   end
 
+  # Checks that focus was passed and (optionally) that any options 
+  # were supplied.
   def assert_pass_focus(options = {})
-    if @socket_string =~ /^<(\w+) \d+>\n(.+)?$/m
-      type = $1
-      body = $2
-      message = Honcho::Message.new type, body
+    if @socket_string =~ /^<(?<type>\w+) \d+>\n(?<body>.+)?$/m
+      message = Honcho::Message.new $~[:type], $~[:body]
+    end
 
-      error = "Expected focus to be passed, but it was not"
-      assert(message.type == :passfocus, error)
+    unless message
+      flunk "Expected focus to be passed, but no response was sent."
+    end
 
-      if not options.empty?
-        if message.body
-          error = "Expected passfocus to be supplied with\n'#{options}' but it was supplied with\n'#{message.body}'."
-          assert(message.body["application"] == options[:application], error)
-        else
-          flunk "Expected focus to be passed to '#{options[:application]}' but it was not passed an application"
-        end
+    error = "Expected focus to be passed, but it was not"
+    assert(message.type == :passfocus, error)
+
+    if not options.empty?
+      if message.body
+        error = "Expected passfocus to be supplied with\n'#{options}' but it was supplied with\n'#{message.body}'."
+        assert(message.body == options, error)
+      else
+        flunk "Expected passfocus to be passed '#{options}' but it was not passed any."
       end
-    else
-      flunk "Expected focus to be passed, but it was not."
     end
   end
 end

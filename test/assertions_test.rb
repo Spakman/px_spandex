@@ -21,9 +21,14 @@ class AssertionsTest < Test::Unit::CardTestCase
   def setup
     @socket_string = ""
     FileUtils.rm_f "/tmp/#{File.basename($0)}.socket"
-    UNIXServer.open "/tmp/#{File.basename($0)}.socket"
+    @server = UNIXServer.open "/tmp/#{File.basename($0)}.socket"
     @application = Spandex::AssertionsTest::TestApplication.new
     @application.cards = [ Spandex::AssertionsTest::TestCard.new(@socket_string, @application) ]
+  end
+
+  def teardown
+    @server.close unless @server.closed?
+    FileUtils.rm_f "/tmp/#{File.basename($0)}.socket"
   end
 
   # Tests that an assertion passes.
@@ -43,6 +48,25 @@ class AssertionsTest < Test::Unit::CardTestCase
       return exception
     end
     raise MiniTest::Assertion.new("Assertion should have failed, but did not.")
+  end
+
+  def test_setup_card_test
+    # since the setup method here basically does the same as
+    # setup_card_test, let's first undo that stuff
+    @socket_string = nil
+    teardown
+    @application = nil
+    # now perform the test
+    setup_card_test Spandex::AssertionsTest::TestCard
+    assert_empty @socket_string
+    assert_kind_of TestApplication, @application
+    assert_kind_of Spandex::AssertionsTest::TestCard, @card
+    assert_equal [ @card ], @application.cards
+  end
+
+  def test_rendered
+    @socket_string = "<render 21>\n<title>Hello!</title>"
+    assert_equal "<title>Hello!</title>", rendered
   end
 
   def test_assert_card_without_params
@@ -73,19 +97,19 @@ class AssertionsTest < Test::Unit::CardTestCase
 
   def test_assert_pass_focus_without_params
     failure = refute_assertion { assert_pass_focus }
-    assert_equal "Expected focus to be passed, but it was not.", failure.message
+    assert_equal "Expected focus to be passed, but no response was sent.", failure.message
     @application.cards.last.pass_focus
     assert_assertion { assert_pass_focus }
   end
 
-  def test_assert_pass_focus_expecting_application
+  def test_assert_pass_focus_expecting_params
     @application.cards.last.pass_focus
     assert_assertion { assert_pass_focus }
 
     failure = refute_assertion do
-      assert_pass_focus application: "boom"
+      assert_pass_focus application: "boom", method: "kerchow"
     end
-    assert_equal "Expected focus to be passed to 'boom' but it was not passed an application", failure.message
+    assert_equal "Expected passfocus to be passed '{:application=>\"boom\", :method=>\"kerchow\"}' but it was not passed any.", failure.message
   end
 
   def test_assert_pass_focus_passing_application
@@ -97,6 +121,18 @@ class AssertionsTest < Test::Unit::CardTestCase
     failure = refute_assertion do
       assert_pass_focus application: "messier"
     end
-    assert_equal "Expected passfocus to be supplied with\n'{:application=>\"messier\"}' but it was supplied with\n'{\"application\"=>\"mozart\"}'.", failure.message
+    assert_equal "Expected passfocus to be supplied with\n'{:application=>\"messier\"}' but it was supplied with\n'{:application=>\"mozart\"}'.", failure.message
+  end
+
+  def test_assert_pass_focus_passing_application_and_method
+    @application.cards.last.pass_focus application: "mozart", method: "queue_ids"
+    assert_assertion { assert_pass_focus }
+    assert_assertion do
+      assert_pass_focus method: "queue_ids", application: "mozart"
+    end
+    failure = refute_assertion do
+      assert_pass_focus application: "messier", method: "queue_ids"
+    end
+    assert_equal "Expected passfocus to be supplied with\n'{:application=>\"messier\", :method=>\"queue_ids\"}' but it was supplied with\n'{:application=>\"mozart\", :method=>\"queue_ids\"}'.", failure.message
   end
 end
