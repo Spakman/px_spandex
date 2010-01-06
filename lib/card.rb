@@ -6,7 +6,7 @@ require "honcho/message"
 
 module Spandex
   class Card
-    attr_accessor :params
+    attr_accessor :params, :responded
 
     # Creates a new Card.
     def initialize(socket, application)

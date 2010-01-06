@@ -14,7 +14,7 @@ module Kernel
 end
 
 class MyCard
-  attr_accessor :params
+  attr_accessor :params, :responded
   attr_reader :show_called, :messages_received
   def initialize(socket, application)
     @show_called = 0
@@ -35,6 +35,12 @@ class MySecondCard < MyCard; end
 class TestApplication < Spandex::Application
   attr_reader :cards, :socket
   entry_point MyCard
+end
+
+class BackgroundTestApplication < Spandex::Application
+  attr_reader :cards, :socket
+  entry_point MyCard
+  can_run_in_background
 end
 
 class ApplicationTest < Test::Unit::TestCase
@@ -98,6 +104,14 @@ class ApplicationTest < Test::Unit::TestCase
     sleep 0.2
     assert_equal "<closing 0>\n", @socket.read
     assert exit_called?
+  end
+
+  def test_previous_card_with_no_cards_left_and_can_run_in_background
+    @application.class.class_eval "can_run_in_background"
+    @application.previous_card
+    sleep 0.2
+    assert_equal "<passfocus 0>\n", @socket.read(14)
+    refute exit_called?
   end
 
   def test_run
