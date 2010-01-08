@@ -11,8 +11,12 @@ module Spandex
       @max_items = max_items
     end
 
+    # Tries to fetch an item from the cache based on the index. So that we
+    # expire items that were accessed least recently when the cache is full,
+    # this operation is actually an expire and a put.
     def get(index)
-      @cache[index]
+      item = expire index
+      put index, item
     end
 
     def put(index, value)
