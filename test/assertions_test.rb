@@ -135,4 +135,26 @@ class AssertionsTest < Test::Unit::CardTestCase
     end
     assert_equal "Expected passfocus to be supplied with\n'{:application=>\"messier\", :method=>\"queue_ids\"}' but it was supplied with\n'{:application=>\"mozart\", :method=>\"queue_ids\"}'.", failure.message
   end
+
+  def test_assert_button_label
+    @socket_string = <<XML
+<button position="top_left">top left</button>
+<button position="top_right">top right</button>
+<button position="bottom_left">bottom left</button>
+<button position="bottom_right">bottom right</button>
+XML
+    assert_assertion do
+      assert_button_label :top_left, "top left"
+      assert_button_label :top_right, "top right"
+      assert_button_label :bottom_left, "bottom left"
+      assert_button_label :bottom_right, "bottom right"
+    end
+    refute_assertion do
+      assert_button_label :top_left, "not top left"
+      assert_button_label :top_right, "not top right"
+      assert_button_label :bottom_left, "not bottom left"
+      assert_button_label :bottom_right, "not bottom right"
+    end
+  end
+
 end

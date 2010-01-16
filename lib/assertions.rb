@@ -81,4 +81,11 @@ class Test::Unit::CardTestCase < Test::Unit::TestCase
       end
     end
   end
+
+  # Checks that the supplied button has the correct label
+  def assert_button_label(button, expected_label)
+    label = rendered[/<button position="#{button}">(.+?)<\/button>/, 1]
+    error = "Expected #{button} button to have the label '#{expected_label}', but it had '#{label}'"
+    assert(expected_label == label, error)
+  end
 end
