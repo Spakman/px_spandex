@@ -14,7 +14,7 @@ module Kernel
 end
 
 class MyCard
-  attr_accessor :params
+  attr_accessor :params, :responded
   attr_reader :show_called, :messages_received
   def initialize(socket, application)
     @show_called = 0
@@ -31,10 +31,25 @@ class MyCard
 end
 
 class MySecondCard < MyCard; end
+class MyThirdCard < MyCard; end
 
 class TestApplication < Spandex::Application
+  attr_accessor :cards
+  attr_reader :socket, :cards_cache
+  entry_point MyCard
+end
+
+class BackgroundTestApplication < Spandex::Application
   attr_reader :cards, :socket
   entry_point MyCard
+  can_run_in_background
+end
+
+class Spandex::Cache
+  attr_reader :cache
+  def size
+    @cache.size
+  end
 end
 
 class ApplicationTest < Test::Unit::TestCase
@@ -85,6 +100,26 @@ class ApplicationTest < Test::Unit::TestCase
     assert_equal 123, @application.cards.last.params
   end
 
+  def test_cards_are_cached_based_on_card_stack
+    second_card = @application.load_card MySecondCard
+    assert_equal 2, @application.cards_cache.size
+    third_card = @application.load_card MyThirdCard
+    assert_equal 3, @application.cards_cache.size
+
+    # Now let's reset the card stack and load the third card again.
+    # This should be a *different* instance of the third card, since
+    # the stack 'leading' to it is different (there is no MySecondCard
+    # this time).
+    @application.cards = [ @application.cards.first ]
+    refute_equal third_card, @application.load_card(MyThirdCard)
+    assert_equal 4, @application.cards_cache.size
+
+    # Reset and make sure we get a cache hit when loading MySecondCard.
+    @application.cards = [ @application.cards.first ]
+    assert_equal second_card, @application.load_card(MySecondCard)
+    assert_equal 4, @application.cards_cache.size
+  end
+
   def test_previous_card
     @application.load_card MySecondCard
     @application.previous_card
@@ -98,6 +133,14 @@ class ApplicationTest < Test::Unit::TestCase
     sleep 0.2
     assert_equal "<closing 0>\n", @socket.read
     assert exit_called?
+  end
+
+  def test_previous_card_with_no_cards_left_and_can_run_in_background
+    @application.class.class_eval "can_run_in_background"
+    @application.previous_card
+    sleep 0.2
+    assert_equal "<passfocus 0>\n", @socket.read(14)
+    refute exit_called?
   end
 
   def test_run

@@ -4,13 +4,27 @@
 
 require "socket"
 require "honcho/message"
+require_relative "cache"
 
 module Spandex
   class Application
     def initialize
       @socket = UNIXSocket.open "/tmp/#{File.basename($0)}.socket"
       @cards = []
+      @cards_cache = Cache.new
       load_card entry_point
+    end
+
+    # Can this application run in the background? In other words, when focus is
+    # passed should the application remain active?
+    def can_run_in_background?
+      false
+    end
+
+    def self.can_run_in_background
+      define_method "can_run_in_background?" do
+        true
+      end
     end
 
     def self.entry_point(klass)
@@ -19,16 +33,35 @@ module Spandex
       end
     end
 
+    # Loads a card. The cards are cached based on the contents of the card
+    # stack. Spandex has been designed with tree-like application structures in
+    # mind (like the menu system in Messier), but some cards can be accessed
+    # via different branches (for example, one can arrive at the ArtistsCard in
+    # Messier from the MenuCard or from the MenuCard via the GenresCard - in
+    # this case there are two instances of the ArtistsCard in the cache).
     def load_card(klass, params = nil)
-      @cards << klass.new(@socket, self)
-      @cards.last.params = params
+      index = @cards.map { |c| c.class.hash.to_s }.join
+      index += klass.hash.to_s
+      unless card = @cards_cache.get(index)
+        card = klass.new(@socket, self)
+      end
+      card.params = params
+      @cards_cache.put index, card
+      @cards << card
       @cards.last.show
+      card
     end
 
     def previous_card
-      @cards.pop
+      card = @cards.pop
       if @cards.last
         @cards.last.show
+      elsif can_run_in_background?
+        # send a passfocus and put the card back on the stack so that something
+        # is there when we return to the application!
+        @socket << Honcho::Message.new(:passfocus)
+        card.responded = true
+        @cards << card
       else
         @socket << Honcho::Message.new(:closing)
         @socket.close
