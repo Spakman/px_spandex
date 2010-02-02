@@ -3,6 +3,8 @@
 # See COPYING
 
 $LOAD_PATH.unshift "#{ENV["PROJECT_X_BASE"]}/lib/"
+require "test/unit"
+require "fileutils"
 require "honcho/message"
 require_relative "application"
 require_relative "card"

@@ -34,6 +34,11 @@ class FakeApplication
 
   def load_card(klass, params = nil)
     @load_card_called = [ klass, params ]
+    if klass
+      klass.new(nil, nil)
+    else
+      @load_card_called
+    end
   end
 end
 
@@ -172,5 +177,10 @@ class CardTest < Test::Unit::TestCase
     @card.top_right
     assert_equal 1, @card.call_me_called
     assert_equal "this was a lambda", @card.call_me_params
+  end
+
+  def test_load_card
+    card = @card.load_card SecondCard
+    assert_instance_of SecondCard, card
   end
 end
