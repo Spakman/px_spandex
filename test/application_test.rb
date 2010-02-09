@@ -35,7 +35,7 @@ class MyThirdCard < MyCard; end
 
 class TestApplication < Spandex::Application
   attr_accessor :cards
-  attr_reader :socket, :cards_cache
+  attr_reader :socket, :cards_cache, :have_focus
   entry_point MyCard
 end
 
@@ -154,5 +154,17 @@ class ApplicationTest < Test::Unit::TestCase
     @application.load_card MySecondCard
     @socket << "<inputevent 8>\ntop_left"; sleep 0.2
     assert_equal 1, @application.cards.last.messages_received.length
+  end
+
+  def test_keeps_track_of_focus_state
+    Thread.new do
+      @application.run
+    end
+    sleep 0.2
+    refute @application.have_focus
+    @socket << "<havefocus 0>\n"; sleep 0.2
+    assert @application.have_focus
+    @application.unfocus
+    refute @application.have_focus
   end
 end

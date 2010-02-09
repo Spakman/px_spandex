@@ -8,10 +8,13 @@ require_relative "cache"
 
 module Spandex
   class Application
+    attr_reader :have_focus
+
     def initialize
       @socket = UNIXSocket.open "/tmp/#{File.basename($0)}.socket"
       @cards = []
       @cards_cache = Cache.new
+      @have_focus = false
       load_card entry_point
     end
 
@@ -60,6 +63,7 @@ module Spandex
         # send a passfocus and put the card back on the stack so that something
         # is there when we return to the application!
         @socket << Honcho::Message.new(:passfocus)
+        unfocus
         card.responded = true
         @cards << card
       else
@@ -67,6 +71,12 @@ module Spandex
         @socket.close
         exit
       end
+    end
+
+    # TODO: move the message passing from Card to Application to reduce
+    # duplication and make it easier to track focus state.
+    def unfocus
+      @have_focus = false
     end
 
     def run
@@ -79,6 +89,9 @@ module Spandex
         if header =~ /^<(?<type>\w+) (?<length>\d+)>\n$/
           body = @socket.read $~[:length].to_i
           message = Honcho::Message.new $~[:type], body
+          if message.type == :havefocus
+            @have_focus = true
+          end
           @cards.last.receive_message message
         end
       end

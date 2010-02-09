@@ -173,12 +173,15 @@ module Spandex
       @responded
     end
 
-    def pass_focus(options = nil)
+    def respond_pass_focus(options = nil)
       unless already_responded?
         @socket << Honcho::Message.new(:passfocus, options)
+        @application.unfocus
         @responded = true
       end
     end
+
+    alias_method :pass_focus, :respond_pass_focus
 
     def respond_keep_focus
       unless already_responded?
@@ -192,14 +195,19 @@ module Spandex
     # be tring to render from a thread that isn't aware the
     # socket has closed.
     def render(markup)
-      begin
-        @socket << Honcho::Message.new(:render, markup)
-      rescue Errno::EPIPE
+      if @application.have_focus
+        begin
+          @socket << Honcho::Message.new(:render, markup)
+        rescue Errno::EPIPE
+        end
       end
     end
 
     def render_every(seconds, &block)
-      Thread.new do
+      if @render_thread
+        @render_thread.exit
+      end
+      @render_thread = Thread.new do
         loop do
           render yield
           sleep seconds

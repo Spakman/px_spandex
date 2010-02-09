@@ -27,9 +27,18 @@ end
 class SecondCard < TestCard; end
 
 class FakeApplication
-  attr_reader :previous_card_called, :load_card_called
+  attr_reader :previous_card_called, :load_card_called, :have_focus
+
+  def initialize
+    @have_focus = true
+  end
+
   def previous_card
     @previous_card_called = 1
+  end
+
+  def unfocus
+    @have_focus = false
   end
 
   def load_card(klass, params = nil)
@@ -72,11 +81,25 @@ class CardTest < Test::Unit::TestCase
     assert_equal "<keepfocus 0>\n", @socket.bytes_written
   end
 
+  def test_pass_focus
+    @card.respond_pass_focus
+    refute @application.have_focus
+    assert_equal "<passfocus 0>\n", @socket.bytes_written
+  end
+
   def test_render
     @socket.bytes_written = ""
     markup = "<text>this is some markup</text>"
     @card.render markup
     assert_equal "<render #{markup.length}>\n#{markup}", @socket.bytes_written
+  end
+
+  def test_dont_render_without_focus
+    @application.unfocus
+    @socket.bytes_written = ""
+    markup = "<text>this is some markup</text>"
+    @card.render markup
+    assert_equal "", @socket.bytes_written
   end
 
   def test_render_every

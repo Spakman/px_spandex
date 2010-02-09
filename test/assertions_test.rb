@@ -98,12 +98,12 @@ class AssertionsTest < Test::Unit::CardTestCase
   def test_assert_pass_focus_without_params
     failure = refute_assertion { assert_pass_focus }
     assert_equal "Expected focus to be passed, but no response was sent.", failure.message
-    @application.cards.last.pass_focus
+    @application.cards.last.respond_pass_focus
     assert_assertion { assert_pass_focus }
   end
 
   def test_assert_pass_focus_expecting_params
-    @application.cards.last.pass_focus
+    @application.cards.last.respond_pass_focus
     assert_assertion { assert_pass_focus }
 
     failure = refute_assertion do
@@ -113,7 +113,7 @@ class AssertionsTest < Test::Unit::CardTestCase
   end
 
   def test_assert_pass_focus_passing_application
-    @application.cards.last.pass_focus application: "mozart"
+    @application.cards.last.respond_pass_focus application: "mozart"
     assert_assertion { assert_pass_focus }
     assert_assertion do
       assert_pass_focus application: "mozart"
@@ -125,7 +125,7 @@ class AssertionsTest < Test::Unit::CardTestCase
   end
 
   def test_assert_pass_focus_passing_application_and_method
-    @application.cards.last.pass_focus application: "mozart", method: "queue_ids"
+    @application.cards.last.respond_pass_focus application: "mozart", method: "queue_ids"
     assert_assertion { assert_pass_focus }
     assert_assertion do
       assert_pass_focus method: "queue_ids", application: "mozart"
