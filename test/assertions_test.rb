@@ -157,4 +157,34 @@ XML
     end
   end
 
+  def test_assert_text
+    @socket_string = <<XML
+<button position="top_left">Back</button>
+<text>Hello there</text>
+<text>Goodbye</text>
+<nottext>Nothing to see here</text>
+XML
+    assert_assertion do
+      assert_text "Hello there"
+      assert_text "Goodbye"
+    end
+    refute_assertion do
+      assert_text "Hello"
+      assert_text "there"
+      assert_text "Back"
+      assert_text "Nothing to see here"
+    end
+  end
+
+  def test_assert_text_escapes_regex_characters
+    @socket_string = <<XML
+<text>Hello/Goodbye</text>
+XML
+    assert_assertion do
+      assert_text "Hello/Goodbye"
+    end
+    refute_assertion do
+      assert_text "Hello.Goodbye"
+    end
+  end
 end

@@ -92,4 +92,10 @@ class Test::Unit::CardTestCase < Test::Unit::TestCase
     error = "Expected #{button} button to have the label '#{expected_label}', but it had '#{label}'"
     assert(expected_label == label, error)
   end
+
+  # Checks that the supplied button has the correct label
+  def assert_text(expected_text)
+    error = "Expected to find a <text> element containing '#{expected_text}', but none were found'"
+    assert(rendered =~ /<text.*?>#{Regexp.escape(expected_text)}<\/text>/)
+  end
 end
