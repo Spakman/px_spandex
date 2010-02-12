@@ -203,10 +203,14 @@ module Spandex
       end
     end
 
-    def render_every(seconds, &block)
+    def kill_render_thread
       if @render_thread
         @render_thread.exit
       end
+    end
+
+    def render_every(seconds, &block)
+      kill_render_thread
       @render_thread = Thread.new do
         loop do
           render yield

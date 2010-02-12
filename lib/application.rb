@@ -43,6 +43,7 @@ module Spandex
     # Messier from the MenuCard or from the MenuCard via the GenresCard - in
     # this case there are two instances of the ArtistsCard in the cache).
     def load_card(klass, params = nil)
+      @cards.last.kill_render_thread if @cards.size > 0
       index = @cards.map { |c| c.class.hash.to_s }.join
       index += klass.hash.to_s
       unless card = @cards_cache.get(index)
@@ -57,6 +58,7 @@ module Spandex
 
     def previous_card
       card = @cards.pop
+      card.kill_render_thread
       if @cards.last
         @cards.last.show
       elsif can_run_in_background?

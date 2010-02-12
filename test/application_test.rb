@@ -15,10 +15,15 @@ end
 
 class MyCard
   attr_accessor :params, :responded
-  attr_reader :show_called, :messages_received
+  attr_reader :show_called, :messages_received, :kill_render_thread_called
   def initialize(socket, application)
     @show_called = 0
     @messages_received = []
+    @kill_render_thread_called = false
+  end
+
+  def kill_render_thread
+    @kill_render_thread_called = true
   end
 
   def show
@@ -90,6 +95,7 @@ class ApplicationTest < Test::Unit::TestCase
     assert_instance_of MySecondCard, @application.cards.last
     assert_equal 1, @application.cards.last.show_called
     assert_nil @application.cards.last.params
+    assert @application.cards.first.kill_render_thread_called
   end
 
   def test_load_card_with_params
@@ -98,6 +104,7 @@ class ApplicationTest < Test::Unit::TestCase
     assert_instance_of MySecondCard, @application.cards.last
     assert_equal 1, @application.cards.last.show_called
     assert_equal 123, @application.cards.last.params
+    assert @application.cards.first.kill_render_thread_called
   end
 
   def test_cards_are_cached_based_on_card_stack
@@ -121,25 +128,30 @@ class ApplicationTest < Test::Unit::TestCase
   end
 
   def test_previous_card
-    @application.load_card MySecondCard
+    card = @application.load_card MySecondCard
     @application.previous_card
     assert_equal 1, @application.cards.length
     assert_instance_of MyCard, @application.cards.last
     assert_equal 2, @application.cards.last.show_called
+    assert card.kill_render_thread_called
   end
 
   def test_previous_card_with_no_cards_left
+    card = @application.cards.first
     @application.previous_card
     sleep 0.2
     assert_equal "<closing 0>\n", @socket.read
+    assert card.kill_render_thread_called
     assert exit_called?
   end
 
   def test_previous_card_with_no_cards_left_and_can_run_in_background
+    card = @application.cards.first
     @application.class.class_eval "can_run_in_background"
     @application.previous_card
     sleep 0.2
     assert_equal "<passfocus 0>\n", @socket.read(14)
+    assert card.kill_render_thread_called
     refute exit_called?
   end
 
