@@ -11,6 +11,8 @@ require_relative "card"
 require_relative "list"
 
 class Spandex::Card
+  attr_accessor :socket
+
   def ==(object)
     if object.kind_of? Spandex::Card
       self.class == object.class
@@ -42,7 +44,8 @@ class Test::Unit::CardTestCase < Test::Unit::TestCase
     UNIXServer.open "/tmp/#{File.basename($0)}.socket"
     @application = TestApplication.new
     @application.have_focus = true
-    @card = card.new @socket_string, @application
+    @card = @application.cards.first
+    @card.socket = @socket_string
   end
 
   # Returns the rendered string.
