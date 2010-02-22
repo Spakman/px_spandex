@@ -73,6 +73,7 @@ module Spandex
         @socket.close
         exit
       end
+      @cards.last
     end
 
     # TODO: move the message passing from Card to Application to reduce

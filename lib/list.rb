@@ -8,6 +8,8 @@ module Spandex
     attr_reader :items
     NUMBER_OF_LIST_ITEMS_TO_DISPLAY = 5
 
+    # Items is an array of items for display. If an item responds to #call,
+    # that output is used, otherwise #to_s is called.
     def initialize(items)
       @items = items
       @selected_index = 0
@@ -16,6 +18,14 @@ module Spandex
 
     def selected
       @items[@selected_index]
+    end
+
+    def selected_name
+      if selected.respond_to? :call
+        selected.call
+      else
+        selected
+      end
     end
 
     def select_next
@@ -47,7 +57,11 @@ module Spandex
       @items[@starting_item...@starting_item+NUMBER_OF_LIST_ITEMS_TO_DISPLAY].each do |item|
         list << "  <item"
         list << ' selected="yes"' if item == @items[@selected_index]
-        list << ">#{item}</item>\n"
+        if item.respond_to? :call
+          list << ">#{item.call}</item>\n"
+        else
+          list << ">#{item}</item>\n"
+        end
       end
       list << "</list>\n"
     end

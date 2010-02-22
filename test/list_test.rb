@@ -131,4 +131,21 @@ LIST
 LIST
     assert_equal expected, @list.to_s
   end
+
+  def test_lambda_items_display
+    @list = Spandex::List.new [ "String", -> { "Lambda" } ]
+    assert_equal %{<list>
+  <item selected="yes">String</item>
+  <item>Lambda</item>
+</list>
+}, @list.to_s
+    assert_equal "String", @list.selected_name
+  end
+
+  def test_selected_name
+    @list = Spandex::List.new [ "String", -> { "Lambda" } ]
+    assert_equal "String", @list.selected_name
+    @list.instance_eval "@selected_index = 1"
+    assert_equal "Lambda", @list.selected_name
+  end
 end
