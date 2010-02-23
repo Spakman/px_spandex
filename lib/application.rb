@@ -47,7 +47,7 @@ module Spandex
       index = @cards.map { |c| c.class.hash.to_s }.join
       index += klass.hash.to_s
       unless card = @cards_cache.get(index)
-        card = klass.new(@socket, self)
+        card = klass.new(self)
       end
       card.params = params
       @cards_cache.put index, card
@@ -64,8 +64,7 @@ module Spandex
       elsif can_run_in_background?
         # send a passfocus and put the card back on the stack so that something
         # is there when we return to the application!
-        @socket << Honcho::Message.new(:passfocus)
-        unfocus
+        respond_pass_focus
         card.responded = true
         @cards << card
       else
@@ -76,8 +75,6 @@ module Spandex
       @cards.last
     end
 
-    # TODO: move the message passing from Card to Application to reduce
-    # duplication and make it easier to track focus state.
     def unfocus
       @have_focus = false
     end
@@ -102,6 +99,15 @@ module Spandex
         rescue Errno::EPIPE
         end
       end
+    end
+
+    def respond_keep_focus
+      @socket << Honcho::Message.new(:keepfocus)
+    end
+
+    def respond_pass_focus(options = nil)
+      @socket << Honcho::Message.new(:passfocus, options)
+      unfocus
     end
 
     def run

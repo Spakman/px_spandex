@@ -9,8 +9,7 @@ module Spandex
     attr_accessor :params, :responded
 
     # Creates a new Card.
-    def initialize(socket, application)
-      @socket = socket
+    def initialize(application)
       @application = application
       @responded = false
       after_initialize
@@ -175,8 +174,7 @@ module Spandex
 
     def respond_pass_focus(options = nil)
       unless already_responded?
-        @socket << Honcho::Message.new(:passfocus, options)
-        @application.unfocus
+        @application.respond_pass_focus options
         @responded = true
       end
     end
@@ -185,25 +183,13 @@ module Spandex
 
     def respond_keep_focus
       unless already_responded?
-        @socket << Honcho::Message.new(:keepfocus)
+        @application.respond_keep_focus
         @responded = true
       end
     end
 
-    # Creates a Honcho message from the supplied markup and
-    # sends it down the pipe. Rescues EPIPE errors since we may
-    # be tring to render from a thread that isn't aware the
-    # socket has closed.
     def render(markup)
       @application.render self, markup
-    end
-
-    # Exits the thread that is currently rendering every X seconds,
-    # if it exists.
-    def stop_rendering
-      if @render_thread
-        @render_thread.exit
-      end
     end
 
     def render_every(seconds, &block)
@@ -213,6 +199,14 @@ module Spandex
           @application.render self, &block
           sleep seconds
         end
+      end
+    end
+
+    # Exits the thread that is currently rendering every X seconds,
+    # if it exists.
+    def stop_rendering
+      if @render_thread
+        @render_thread.exit
       end
     end
   end

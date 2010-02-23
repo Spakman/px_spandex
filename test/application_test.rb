@@ -18,7 +18,7 @@ end
 class MyCard
   attr_accessor :params, :responded
   attr_reader :show_called, :messages_received, :stop_rendering_called
-  def initialize(socket, application)
+  def initialize(application)
     @show_called = 0
     @messages_received = []
     @stop_rendering_called = false

@@ -12,7 +12,7 @@ module Spandex::AssertionsTest
   end
 
   class TestApplication < Spandex::Application
-    attr_accessor :cards
+    attr_accessor :cards, :socket
     entry_point TestCard
   end
 end
@@ -23,7 +23,8 @@ class AssertionsTest < Test::Unit::CardTestCase
     FileUtils.rm_f "/tmp/#{File.basename($0)}.socket"
     @server = UNIXServer.open "/tmp/#{File.basename($0)}.socket"
     @application = Spandex::AssertionsTest::TestApplication.new
-    @application.cards = [ Spandex::AssertionsTest::TestCard.new(@socket_string, @application) ]
+    @application.cards = [ Spandex::AssertionsTest::TestCard.new(@application) ]
+    @application.socket = @socket_string
   end
 
   def teardown

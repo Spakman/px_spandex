@@ -22,6 +22,9 @@ class TestApp
   def load_card(card, params)
     @load_card_called = true
   end
+
+  def respond_keep_focus;end
+  def respond_pass_focus(options = nil);end
 end
 
 class TestListCard < Spandex::ListCard
@@ -37,21 +40,21 @@ end
 
 class ListCardTest < Test::Unit::TestCase
   def test_jog_wheel_left_is_defined
-    card = TestListCard.new "", TestApp.new
+    card = TestListCard.new TestApp.new
     card.jog_wheel_left
     assert card.show_called
     assert card.list.select_previous_called
   end
 
   def test_jog_wheel_right_is_defined
-    card = TestListCard.new "", TestApp.new
+    card = TestListCard.new TestApp.new
     card.jog_wheel_right
     assert card.show_called
     assert card.list.select_next_called
   end
 
   def test_jog_wheel_button_is_defined
-    card = TestListCard.new "", TestApp.new
+    card = TestListCard.new TestApp.new
     card.jog_wheel_button
     refute card.show_called
     assert card.list.selected

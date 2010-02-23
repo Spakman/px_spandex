@@ -44,8 +44,7 @@ class Test::Unit::CardTestCase < Test::Unit::TestCase
     UNIXServer.open "/tmp/#{File.basename($0)}.socket"
     @application = TestApplication.new
     @application.have_focus = true
-    @card = @application.cards.first
-    @card.socket = @socket_string
+    @card = @application.cards.last
     @application.socket = @socket_string
   end
 
