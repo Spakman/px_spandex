@@ -195,25 +195,22 @@ module Spandex
     # be tring to render from a thread that isn't aware the
     # socket has closed.
     def render(markup)
-      if @application.have_focus
-        begin
-          @socket << Honcho::Message.new(:render, markup)
-        rescue Errno::EPIPE
-        end
-      end
+      @application.render self, markup
     end
 
-    def kill_render_thread
+    # Exits the thread that is currently rendering every X seconds,
+    # if it exists.
+    def stop_rendering
       if @render_thread
         @render_thread.exit
       end
     end
 
     def render_every(seconds, &block)
-      kill_render_thread
+      stop_rendering
       @render_thread = Thread.new do
         loop do
-          render yield
+          @application.render self, &block
           sleep seconds
         end
       end

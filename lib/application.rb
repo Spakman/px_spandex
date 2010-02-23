@@ -43,7 +43,7 @@ module Spandex
     # Messier from the MenuCard or from the MenuCard via the GenresCard - in
     # this case there are two instances of the ArtistsCard in the cache).
     def load_card(klass, params = nil)
-      @cards.last.kill_render_thread if @cards.size > 0
+      @cards.last.stop_rendering if @cards.size > 0
       index = @cards.map { |c| c.class.hash.to_s }.join
       index += klass.hash.to_s
       unless card = @cards_cache.get(index)
@@ -58,7 +58,7 @@ module Spandex
 
     def previous_card
       card = @cards.pop
-      card.kill_render_thread
+      card.stop_rendering
       if @cards.last
         @cards.last.show
       elsif can_run_in_background?
@@ -80,6 +80,28 @@ module Spandex
     # duplication and make it easier to track focus state.
     def unfocus
       @have_focus = false
+    end
+
+    # Sends a render request to Honcho. Can take markup or a block argument to
+    # render.
+    #
+    # Will only send a request when the application has focus and when render
+    # was called by the active card.
+    def render(card, markup = nil, &block)
+      unless markup or block_given?
+        raise "Trying to render without passing either markup or a block"
+      end
+      if have_focus and card == @cards.last
+        begin
+          if block_given?
+            markup = block.call
+          end
+          if markup.kind_of? String
+            @socket << Honcho::Message.new(:render, markup)
+          end
+        rescue Errno::EPIPE
+        end
+      end
     end
 
     def run

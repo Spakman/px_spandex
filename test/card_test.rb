@@ -27,10 +27,15 @@ end
 class SecondCard < TestCard; end
 
 class FakeApplication
-  attr_reader :previous_card_called, :load_card_called, :have_focus
+  attr_reader :previous_card_called, :load_card_called, :have_focus, :render_called
 
   def initialize
     @have_focus = true
+    @render_called = 0
+  end
+
+  def render(card, markup = nil, &block)
+    @render_called += 1
   end
 
   def previous_card
@@ -88,26 +93,14 @@ class CardTest < Test::Unit::TestCase
   end
 
   def test_render
-    @socket.bytes_written = ""
-    markup = "<text>this is some markup</text>"
-    @card.render markup
-    assert_equal "<render #{markup.length}>\n#{markup}", @socket.bytes_written
-  end
-
-  def test_dont_render_without_focus
-    @application.unfocus
-    @socket.bytes_written = ""
-    markup = "<text>this is some markup</text>"
-    @card.render markup
-    assert_equal "", @socket.bytes_written
+    @card.render "<text>this is some markup</text>"
+    assert_equal 1, @application.render_called
   end
 
   def test_render_every
-    @socket.bytes_written = ""
-    markup = "1"
-    @card.render_every(1) { markup }
+    @card.render_every(1) { "<text>Go!</text>" }
     sleep 1.5
-    assert_equal "<render #{markup.length}>\n#{markup}<render #{markup.length}>\n#{markup}", @socket.bytes_written
+    assert_equal 2, @application.render_called
   end
 
   def test_receive_havefocus_message

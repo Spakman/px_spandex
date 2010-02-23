@@ -33,7 +33,7 @@ end
 
 class TestApplication < Spandex::Application
   attr_reader :cards
-  attr_accessor :have_focus
+  attr_accessor :have_focus, :socket
 end
 
 class Test::Unit::CardTestCase < Test::Unit::TestCase
@@ -46,6 +46,7 @@ class Test::Unit::CardTestCase < Test::Unit::TestCase
     @application.have_focus = true
     @card = @application.cards.first
     @card.socket = @socket_string
+    @application.socket = @socket_string
   end
 
   # Returns the rendered string.
