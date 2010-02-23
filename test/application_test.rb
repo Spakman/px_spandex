@@ -41,8 +41,8 @@ class MySecondCard < MyCard; end
 class MyThirdCard < MyCard; end
 
 class TestApplication < Spandex::Application
-  attr_accessor :cards
-  attr_reader :socket, :cards_cache, :have_focus
+  attr_accessor :cards, :has_focus
+  attr_reader :socket, :cards_cache
   entry_point MyCard
 end
 
@@ -175,11 +175,11 @@ class ApplicationTest < Test::Unit::TestCase
       @application.run
     end
     sleep 0.2
-    refute @application.have_focus
+    refute @application.has_focus
     @socket << "<havefocus 0>\n"; sleep 0.2
-    assert @application.have_focus
-    @application.unfocus
-    refute @application.have_focus
+    assert @application.has_focus
+    @application.has_focus = false
+    refute @application.has_focus
   end
 
   def test_render_markup

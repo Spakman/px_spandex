@@ -52,10 +52,6 @@ class FakeApplication
     @previous_card_called = 1
   end
 
-  def unfocus
-    @have_focus = false
-  end
-
   def load_card(klass, params = nil)
     @load_card_called = [ klass, params ]
     if klass

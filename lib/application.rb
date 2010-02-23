@@ -8,13 +8,11 @@ require_relative "cache"
 
 module Spandex
   class Application
-    attr_reader :have_focus
-
     def initialize
       @socket = UNIXSocket.open "/tmp/#{File.basename($0)}.socket"
       @cards = []
       @cards_cache = Cache.new
-      @have_focus = false
+      @has_focus = false
       load_card entry_point
     end
 
@@ -75,10 +73,6 @@ module Spandex
       @cards.last
     end
 
-    def unfocus
-      @have_focus = false
-    end
-
     # Sends a render request to Honcho. Can take markup or a block argument to
     # render.
     #
@@ -88,7 +82,7 @@ module Spandex
       unless markup or block_given?
         raise "Trying to render without passing either markup or a block"
       end
-      if have_focus and card == @cards.last
+      if @has_focus and card == @cards.last
         begin
           if block_given?
             markup = block.call
@@ -101,13 +95,15 @@ module Spandex
       end
     end
 
+    # Send a keepfocus response to Honcho.
     def respond_keep_focus
       @socket << Honcho::Message.new(:keepfocus)
     end
 
+    # Send a passfocus response to Honcho.
     def respond_pass_focus(options = nil)
       @socket << Honcho::Message.new(:passfocus, options)
-      unfocus
+      @has_focus = false
     end
 
     def run
@@ -121,7 +117,7 @@ module Spandex
           body = @socket.read $~[:length].to_i
           message = Honcho::Message.new $~[:type], body
           if message.type == :havefocus
-            @have_focus = true
+            @has_focus = true
           end
           @cards.last.receive_message message
         end

@@ -16,6 +16,7 @@ module Spandex
     end
 
     def after_initialize; end
+
     def top_left; respond_keep_focus; end
     def top_right; respond_keep_focus; end
     def bottom_left; respond_keep_focus; end

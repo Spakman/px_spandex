@@ -33,7 +33,7 @@ end
 
 class TestApplication < Spandex::Application
   attr_reader :cards
-  attr_accessor :have_focus, :socket
+  attr_accessor :has_focus, :socket
 end
 
 class Test::Unit::CardTestCase < Test::Unit::TestCase
@@ -43,7 +43,7 @@ class Test::Unit::CardTestCase < Test::Unit::TestCase
     FileUtils.rm_f "/tmp/#{File.basename($0)}.socket"
     UNIXServer.open "/tmp/#{File.basename($0)}.socket"
     @application = TestApplication.new
-    @application.have_focus = true
+    @application.has_focus = true
     @card = @application.cards.last
     @application.socket = @socket_string
   end
