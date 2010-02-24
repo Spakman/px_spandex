@@ -17,15 +17,10 @@ end
 
 class MyCard
   attr_accessor :params, :responded
-  attr_reader :show_called, :messages_received, :stop_rendering_called
+  attr_reader :show_called, :messages_received
   def initialize(application)
     @show_called = 0
     @messages_received = []
-    @stop_rendering_called = false
-  end
-
-  def stop_rendering
-    @stop_rendering_called = true
   end
 
   def show
@@ -41,9 +36,13 @@ class MySecondCard < MyCard; end
 class MyThirdCard < MyCard; end
 
 class TestApplication < Spandex::Application
-  attr_accessor :cards, :has_focus
-  attr_reader :socket, :cards_cache
+  attr_accessor :cards, :has_focus, :stop_rendering_called
+  attr_reader :socket, :cards_cache, :fib
   entry_point MyCard
+
+  def stop_rendering
+    @stop_rendering_called = true
+  end
 end
 
 class BackgroundTestApplication < Spandex::Application
@@ -97,7 +96,7 @@ class ApplicationTest < Test::Unit::TestCase
     assert_instance_of MySecondCard, @application.cards.last
     assert_equal 1, @application.cards.last.show_called
     assert_nil @application.cards.last.params
-    assert @application.cards.first.stop_rendering_called
+    assert @application.stop_rendering_called
   end
 
   def test_load_card_with_params
@@ -106,7 +105,7 @@ class ApplicationTest < Test::Unit::TestCase
     assert_instance_of MySecondCard, @application.cards.last
     assert_equal 1, @application.cards.last.show_called
     assert_equal 123, @application.cards.last.params
-    assert @application.cards.first.stop_rendering_called
+    assert @application.stop_rendering_called
   end
 
   def test_cards_are_cached_based_on_card_stack
@@ -135,7 +134,7 @@ class ApplicationTest < Test::Unit::TestCase
     assert_equal 1, @application.cards.length
     assert_instance_of MyCard, @application.cards.last
     assert_equal 2, @application.cards.last.show_called
-    assert card.stop_rendering_called
+    assert @application.stop_rendering_called
   end
 
   def test_previous_card_with_no_cards_left
@@ -143,7 +142,7 @@ class ApplicationTest < Test::Unit::TestCase
     @application.previous_card
     sleep 0.2
     assert_equal "<closing 0>\n", @socket.read
-    assert card.stop_rendering_called
+    assert @application.stop_rendering_called
     assert exit_called?
   end
 
@@ -153,7 +152,7 @@ class ApplicationTest < Test::Unit::TestCase
     @application.previous_card
     sleep 0.2
     assert_equal "<passfocus 0>\n", @socket.read(14)
-    assert card.stop_rendering_called
+    assert @application.stop_rendering_called
     refute exit_called?
   end
 

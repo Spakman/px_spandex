@@ -27,17 +27,22 @@ end
 class SecondCard < TestCard; end
 
 class FakeApplication
-  attr_reader :previous_card_called, :load_card_called, :have_focus, :render_called, :keep_focus_called, :pass_focus_called
+  attr_reader :previous_card_called, :load_card_called, :have_focus, :render_called, :keep_focus_called, :pass_focus_called, :render_every_called
 
   def initialize
     @have_focus = true
     @render_called = 0
+    @render_every_called = 0
     @keep_focus_called = 0
     @pass_focus_called = 0
   end
 
   def render(card, markup = nil, &block)
     @render_called += 1
+  end
+
+  def render_every(card, seconds, &block)
+    @render_every_called += 1
   end
 
   def respond_keep_focus
@@ -104,8 +109,7 @@ class CardTest < Test::Unit::TestCase
 
   def test_render_every
     @card.render_every(1) { "<text>Go!</text>" }
-    sleep 1.5
-    assert_equal 2, @application.render_called
+    assert_equal 1, @application.render_every_called
   end
 
   def test_receive_havefocus_message

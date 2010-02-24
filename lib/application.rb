@@ -8,6 +8,7 @@ require_relative "cache"
 
 module Spandex
   class Application
+    attr_reader :socket
     def initialize
       @socket = UNIXSocket.open "/tmp/#{File.basename($0)}.socket"
       @cards = []
@@ -41,22 +42,32 @@ module Spandex
     # Messier from the MenuCard or from the MenuCard via the GenresCard - in
     # this case there are two instances of the ArtistsCard in the cache).
     def load_card(klass, params = nil)
-      @cards.last.stop_rendering if @cards.size > 0
-      index = @cards.map { |c| c.class.hash.to_s }.join
-      index += klass.hash.to_s
-      unless card = @cards_cache.get(index)
-        card = klass.new(self)
-      end
+      stop_rendering if @cards.size > 0
+      card = new_or_cached_instance_of(klass)
+      card.responded = false
       card.params = params
-      @cards_cache.put index, card
       @cards << card
       @cards.last.show
       card
     end
 
+    # Fetches an instance of klass from the cache or instatiates it and adds it
+    # to the cache.
+    def new_or_cached_instance_of(klass)
+      index = @cards.map { |c| c.class.hash.to_s }.join
+      index += klass.hash.to_s
+      unless card = @cards_cache.get(index)
+        card = klass.new(self)
+      end
+      @cards_cache.put index, card
+    end
+
+    # Go to the previous card. This removes the calling card from the stack. If
+    # the calling card is the last card on the stack respond with a passfocus.
     def previous_card
+      stop_rendering
       card = @cards.pop
-      card.stop_rendering
+      @fib = nil
       if @cards.last
         @cards.last.show
       elsif can_run_in_background?
@@ -95,6 +106,29 @@ module Spandex
       end
     end
 
+    def stop_rendering
+      @fib = nil
+    end
+
+    # Creates a new Fiber which calls and renders the passed block every few
+    # (specified) seconds.
+    #
+    # TODO: compute the average time taken to call the block and adjust seconds
+    # to compensate.
+    def render_every(card, seconds, &block)
+      if @has_focus
+        @fib = Fiber.new do
+          loop do
+            if not @cards.last.responded or IO.select([ @socket ], nil, nil, seconds)
+              Fiber.yield
+            end
+            render @cards.last, &block
+          end
+        end
+        @fib.resume
+      end
+    end
+
     # Send a keepfocus response to Honcho.
     def respond_keep_focus
       @socket << Honcho::Message.new(:keepfocus)
@@ -109,6 +143,9 @@ module Spandex
     def run
       loop do
         begin
+          if @fib and IO.select([ @socket ], nil, nil, 0).nil?
+            @fib.resume
+          end
           header = @socket.gets
         rescue Errno::ECONNRESET, Errno::EBADF, IOError
           break

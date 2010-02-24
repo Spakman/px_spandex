@@ -194,21 +194,7 @@ module Spandex
     end
 
     def render_every(seconds, &block)
-      stop_rendering
-      @render_thread = Thread.new do
-        loop do
-          @application.render self, &block
-          sleep seconds
-        end
-      end
-    end
-
-    # Exits the thread that is currently rendering every X seconds,
-    # if it exists.
-    def stop_rendering
-      if @render_thread
-        @render_thread.exit
-      end
+      @application.render_every self, seconds, &block
     end
   end
 
