@@ -67,7 +67,6 @@ module Spandex
     def previous_card
       stop_rendering
       card = @cards.pop
-      @fib = nil
       if @cards.last
         @cards.last.show
       elsif can_run_in_background?

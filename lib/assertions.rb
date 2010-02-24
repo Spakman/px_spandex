@@ -20,6 +20,10 @@ class Spandex::Card
       false
     end
   end
+
+  def render_every(seconds, &block)
+    render block.call
+  end
 end
 
 class Spandex::ListCard < Spandex::Card
