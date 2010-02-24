@@ -22,6 +22,13 @@ class TestCard < Spandex::Card
   def call_me_no_params
     @call_me_no_params_called += 1
   end
+
+  # We need to redefine this here in case lib/assertions.rb
+  # is required before these tests are run (this method is
+  # aliased to render() there).
+  def render_every(seconds, &block)
+    old_render_every seconds, &block
+  end
 end
 
 class SecondCard < TestCard; end

@@ -21,6 +21,8 @@ class Spandex::Card
     end
   end
 
+  alias_method :old_render_every, :render_every
+
   def render_every(seconds, &block)
     render block.call
   end
