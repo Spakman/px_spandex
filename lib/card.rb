@@ -6,16 +6,16 @@ require "honcho/message"
 
 module Spandex
   class Card
-    attr_accessor :params, :responded
+    attr_accessor :responded
+    attr_reader :params
 
     # Creates a new Card.
     def initialize(application)
       @application = application
       @responded = false
       after_initialize
+      @params = {}
     end
-
-    def after_initialize; end
 
     def top_left; respond_keep_focus; end
     def top_right; respond_keep_focus; end
@@ -24,6 +24,26 @@ module Spandex
     def jog_wheel_button; respond_keep_focus; end
     def jog_wheel_left; respond_keep_focus; end
     def jog_wheel_right; respond_keep_focus; end
+
+    def after_initialize; end
+    def after_load; end
+    def before_show; end
+    def after_show; end
+
+    def call_show_chain
+      before_show
+      show
+      after_show
+    end
+
+    def params=(params)
+      if params.nil?
+        @params = {}
+      else
+        @params = params
+      end
+      after_load
+    end
 
     # Defines what should happen when the top left button is pressed.
     #
@@ -162,7 +182,7 @@ module Spandex
       @responded = false
       case message.type
       when :havefocus
-        show
+        call_show_chain
         respond_keep_focus
       when :inputevent
         send message.body.chomp.to_sym
@@ -199,8 +219,8 @@ module Spandex
   end
 
   class ListCard < Card
-    jog_wheel_left method: -> { @list.select_previous; show }
-    jog_wheel_right method: -> { @list.select_next; show }
+    jog_wheel_left method: -> { @list.select_previous; call_show_chain }
+    jog_wheel_right method: -> { @list.select_next; call_show_chain }
     jog_wheel_button card: -> { @list.selected }
   end
 end

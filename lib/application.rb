@@ -47,7 +47,7 @@ module Spandex
       card.responded = false
       card.params = params
       @cards << card
-      @cards.last.show
+      @cards.last.call_show_chain
       card
     end
 
@@ -68,7 +68,7 @@ module Spandex
       stop_rendering
       card = @cards.pop
       if @cards.last
-        @cards.last.show
+        @cards.last.call_show_chain
       elsif can_run_in_background?
         # send a passfocus and put the card back on the stack so that something
         # is there when we return to the application!
@@ -118,7 +118,10 @@ module Spandex
       if @has_focus
         @fib = Fiber.new do
           loop do
-            if not @cards.last.responded or IO.select([ @socket ], nil, nil, seconds)
+            if not @cards.last.responded
+              Fiber.yield
+              @cards.last.responded = true
+            elsif IO.select([ @socket ], nil, nil, seconds)
               Fiber.yield
             end
             render @cards.last, &block

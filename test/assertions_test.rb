@@ -74,7 +74,7 @@ class AssertionsTest < Test::Unit::CardTestCase
     assert_assertion { assert_card Spandex::AssertionsTest::TestCard }
 
     failure = refute_assertion { assert_card Spandex::AssertionsTest::SecondTestCard }
-    assert_equal "<Spandex::AssertionsTest::TestCard> expected but was\n<Spandex::AssertionsTest::SecondTestCard>.", failure.message
+    assert_equal "Expected active Card to be Spandex::AssertionsTest::SecondTestCard, but it was Spandex::AssertionsTest::TestCard", failure.message
 
     assert_raises(NameError) { assert_card WrongCard }
   end

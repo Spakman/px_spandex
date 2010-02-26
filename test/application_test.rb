@@ -27,6 +27,8 @@ class MyCard
     @show_called += 1
   end
 
+  alias_method :call_show_chain, :show
+
   def receive_message(message)
     @messages_received << message
   end

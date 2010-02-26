@@ -62,8 +62,8 @@ class Test::Unit::CardTestCase < Test::Unit::TestCase
   # Checks that the passed card_klass is active and that any supplied
   # parameters were passed.
   def assert_card(card_klass, params = nil)
-    message = "Expected active Card to be #{card_klass}, but it was #{@application.cards.last}"
-    assert_equal @application.cards.last.class, card_klass
+    message = "Expected active Card to be #{card_klass}, but it was #{@application.cards.last.class}"
+    assert(@application.cards.last.class == card_klass, message)
 
     if params
       message = "Expected card params to be #{params}, but they were #{@application.cards.last.params}."
