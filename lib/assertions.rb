@@ -12,6 +12,7 @@ require_relative "list"
 
 class Spandex::Card
   attr_accessor :socket
+  attr_reader :list
 
   def ==(object)
     if object.kind_of? Spandex::Card
@@ -26,10 +27,6 @@ class Spandex::Card
   def render_every(seconds, &block)
     render block.call
   end
-end
-
-class Spandex::ListCard < Spandex::Card
-  attr_reader :list
 end
 
 class Spandex::List

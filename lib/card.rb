@@ -216,11 +216,28 @@ module Spandex
     def render_every(seconds, &block)
       @application.render_every self, seconds, &block
     end
-  end
 
-  class ListCard < Card
-    jog_wheel_left method: -> { @list.select_previous; call_show_chain }
-    jog_wheel_right method: -> { @list.select_next; call_show_chain }
-    jog_wheel_button card: -> { @list.selected }
+    # Standard behaviour for the jog wheel when viewing a list of items.
+    module JogWheelListMethods
+      def self.included(base)
+        base.jog_wheel_left method: -> {
+          if @list
+            @list.select_previous
+            call_show_chain
+          end
+        }
+        base.jog_wheel_right method: -> {
+          if @list
+            @list.select_next
+            call_show_chain
+          end
+        }
+        base.jog_wheel_button card: -> {
+          if @list
+            @list.selected
+          end
+        }
+      end
+    end
   end
 end

@@ -27,7 +27,9 @@ class TestApp
   def respond_pass_focus(options = nil);end
 end
 
-class TestListCard < Spandex::ListCard
+class TestListCard < Spandex::Card
+  include Spandex::Card::JogWheelListMethods
+
   attr_reader :list, :show_called
   def after_initialize
     @list = TestList.new
