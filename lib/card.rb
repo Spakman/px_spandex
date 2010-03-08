@@ -164,6 +164,11 @@ module Spandex
       card
     end
 
+    def back_until(klass, params = nil)
+      respond_keep_focus
+      @application.back_until klass, params
+    end
+
     # Returns the result of calling proc_or_not in the context of the instance. 
     # If option is not a Proc, it is simply returned.
     def call_proc_in_instance(proc_or_not, proc_params = nil)

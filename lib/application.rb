@@ -51,6 +51,16 @@ module Spandex
       card
     end
 
+    def back_until(klass, params = nil)
+      stop_rendering
+      begin
+        if @cards.pop.nil?
+          raise "Cannot find an instance of #{klass} on the application stack."
+        end
+      end until @cards.last.instance_of? klass
+      @cards.last.call_show_chain
+    end
+
     # Fetches an instance of klass from the cache or instatiates it and adds it
     # to the cache.
     def new_or_cached_instance_of(klass)

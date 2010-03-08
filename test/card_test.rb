@@ -23,6 +23,8 @@ class TestCard < Spandex::Card
     @call_me_no_params_called += 1
   end
 
+  alias_method :old_render_every, :render_every
+
   # We need to redefine this here in case lib/assertions.rb
   # is required before these tests are run (this method is
   # aliased to render() there).

@@ -158,6 +158,19 @@ class ApplicationTest < Test::Unit::TestCase
     refute exit_called?
   end
 
+  def test_back_until
+    @application.load_card MySecondCard
+    @application.load_card MyThirdCard
+    @application.back_until MyCard
+    assert_equal 1, @application.cards.length
+    assert_equal MyCard, @application.cards.first.class
+  end
+
+  def test_back_until_raises_exception_when_card_not_found
+    @application.load_card MySecondCard
+    assert_raises(RuntimeError) { @application.back_until MyThirdCard }
+  end
+
   def test_run
     Thread.new do
       @application.run
