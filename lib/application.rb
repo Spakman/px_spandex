@@ -132,13 +132,13 @@ module Spandex
       if @has_focus
         @fib = Fiber.new do
           loop do
+            render @cards.last, &block
             if not @cards.last.responded
               Fiber.yield
               @cards.last.responded = true
             elsif IO.select([ @socket ], nil, nil, seconds)
               Fiber.yield
             end
-            render @cards.last, &block
           end
         end
         @fib.resume
