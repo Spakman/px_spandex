@@ -169,7 +169,7 @@ module Spandex
     def call_proc_in_instance(proc_or_not, proc_params = nil)
       if proc_or_not.respond_to? :call
         if proc_or_not.arity == 0
-          instance_eval &proc_or_not
+          instance_exec &proc_or_not
         else
           instance_exec proc_params, &proc_or_not
         end
