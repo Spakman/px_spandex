@@ -217,6 +217,13 @@ module Spandex
       @application.render_every self, seconds, &block
     end
 
+    # Marks the card as basically being a singleton.
+    def self.only_cache_one_instance
+      def self.cache_index
+        self.hash
+      end
+    end
+
     # Standard behaviour for the jog wheel when viewing a list of items.
     module JogWheelListMethods
       def self.included(base)

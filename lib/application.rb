@@ -54,8 +54,12 @@ module Spandex
     # Fetches an instance of klass from the cache or instatiates it and adds it
     # to the cache.
     def new_or_cached_instance_of(klass)
-      index = @cards.map { |c| c.class.hash.to_s }.join
-      index += klass.hash.to_s
+      if klass.respond_to? :cache_index
+        index = klass.cache_index
+      else
+        index = @cards.map { |c| c.class.hash.to_s }.join
+        index += klass.hash.to_s
+      end
       unless card = @cards_cache.get(index)
         card = klass.new(self)
       end
